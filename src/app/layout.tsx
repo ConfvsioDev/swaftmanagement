@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import Sidebar from '@/components/Sidebar';
 import './globals.css';
 
@@ -14,10 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className="flex h-screen bg-zinc-900 text-gray-200">
-        <Sidebar /> {/* Sidebar handles its own user fetching */}
+      <body className="flex h-screen bg-zinc-900 text-gray-200 overflow-hidden">
+        <Sidebar />
         <div className="flex-grow flex flex-col">
-          <main className="flex-grow p-6 overflow-y-auto">
+          <main className="flex-grow">
             {children}
           </main>
         </div>

@@ -1,15 +1,10 @@
-// src/app/page.tsx
-import RootLayout from './layout'; // Importation de RootLayout
+import RootLayout from './layout';
 import Dashboard from '@/components/Dashboard';
 
 export default async function Home() {
   return (
-    <RootLayout> {/* Use RootLayout without additional props for user */}
-      {/* Composant Dashboard */}
-      <div className="bg-zinc-900">
+    <RootLayout>
       <Dashboard />
-      </div>
-      
     </RootLayout>
   );
 }

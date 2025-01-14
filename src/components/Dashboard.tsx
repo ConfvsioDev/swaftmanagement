@@ -101,26 +101,18 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-6 bg-zinc-900 flex-grow">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Tableau de Bord</h1>
-          <p className="text-zinc-400">Bienvenue, {user.nickname || user.user_metadata.full_name}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
-            <Bell className="h-5 w-5" />
-          </button>
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-zinc-800">
-            <Image
-              src={user.user_metadata.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'}
-              alt="Profile"
-              width={32}
-              height={32}
-              className="rounded-full"
-            />
-            <span className="text-zinc-100">{user.nickname || user.user_metadata.full_name}</span>
+    <div className="h-screen overflow-y-auto bg-zinc-900">
+      <div className="p-6">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100">Tableau de Bord</h1>
+            <p className="text-zinc-400">Bienvenue, {user.nickname || user.user_metadata.full_name}</p>
+          </div>
+          <div className="flex items-center">
+            <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+              <Bell className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>

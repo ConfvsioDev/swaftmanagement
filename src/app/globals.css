@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: 15 23 42;
+  --background: 24 24 27;
   --foreground: 226 232 240;
   --primary: 14 165 233;
   --secondary: 71 85 105;
@@ -11,6 +11,11 @@
 }
 
 body {
-  background: linear-gradient(to bottom right, #0f172a, #1e293b);
+  background-color: rgb(var(--background));
   @apply text-slate-200 min-h-screen;
+}
+
+/* Ensure consistent background color throughout the app */
+.bg-zinc-900 {
+  background-color: rgb(var(--background));
 }
