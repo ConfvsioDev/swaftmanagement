@@ -101,8 +101,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="h-screen overflow-y-auto bg-zinc-900">
-      <div className="py-6">
+    <div className="w-[calc(100vw-24rem)] max-w-7xl h-[calc(100vh-4rem)] bg-zinc-900 rounded-xl overflow-hidden">
+      <div className="h-full overflow-y-auto px-6 py-6">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
           <div>

@@ -15,10 +15,8 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body className="flex h-screen bg-zinc-900 text-gray-200 overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex justify-center">
-          <main className="w-[calc(100%-32rem)] max-w-7xl">
-            {children}
-          </main>
+        <div className="flex-1 flex items-center justify-center p-8">
+          {children}
         </div>
       </body>
     </html>
