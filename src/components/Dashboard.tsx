@@ -1,17 +1,18 @@
-// src/components/Dashboard.tsx
-'use client'
-
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import { 
-  ChatBubbleLeftRightIcon, 
-  ClipboardDocumentListIcon, 
-  RectangleStackIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import {
+  LayoutGrid,
+  CheckSquare,
+  MessageSquare,
+  Users,
+  TrendingUp,
+  Calendar,
+  Bell,
+  Clock
+} from 'lucide-react';
 import NicknameModal from './NicknameModal';
-import Image from 'next/image'; // Import Image
+import Image from 'next/image';
 
 interface User {
   id: string;
@@ -23,11 +24,18 @@ interface User {
   nickname?: string;
 }
 
+interface Activity {
+  id: number;
+  title: string;
+  time: string;
+  type: 'task' | 'meeting' | 'update';
+}
+
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showNicknameModal, setShowNicknameModal] = useState(false);
-  
+
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -35,16 +43,14 @@ export default function Dashboard() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Fetch user profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('nickname, avatar_url')
           .eq('id', user.id)
           .single();
 
-        // Set user state
-        setUser({ 
-          ...user, 
+        setUser({
+          ...user,
           nickname: profile?.nickname,
           user_metadata: {
             avatar_url: profile?.avatar_url || user.user_metadata.avatar_url || '',
@@ -52,8 +58,7 @@ export default function Dashboard() {
           }
         });
 
-        // Show modal if nickname is not set
-        if (!profile) {
+        if (!profile?.nickname) {
           setShowNicknameModal(true);
         }
       } else {
@@ -64,89 +69,136 @@ export default function Dashboard() {
 
     getUser();
   }, [supabase, router]);
-  
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   const quickStats = [
-    { title: "Projets", value: "12", icon: <RectangleStackIcon className="h-6 w-6" />, color: "from-purple-600 to-indigo-700" },
-    { title: "Tâches", value: "28", icon: <ClipboardDocumentListIcon className="h-6 w-6" />, color: "from-green-500 to-emerald700" },
-    { title: "Messages", value: "5", icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />, color: "from-pink-500 to-rose700" },
+    { title: "Projets Actifs", value: "12", icon: LayoutGrid, color: "from-violet-600 to-violet-800" },
+    { title: "Tâches", value: "28", icon: CheckSquare, color: "from-emerald-600 to-emerald-800" },
+    { title: "Messages", value: "15", icon: MessageSquare, color: "from-blue-600 to-blue-800" },
+    { title: "Performance", value: "+24%", icon: TrendingUp, color: "from-amber-600 to-amber-800" },
   ];
 
-   // Your performanceData and calendarEvents remain unchanged
+  const teamMembers = [
+    { id: 1, name: 'Sophie Martin', role: 'Designer UI/UX', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
+    { id: 2, name: 'Thomas Dubois', role: 'Développeur', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
+    { id: 3, name: 'Emma Laurent', role: 'Chef de Projet', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
+  ];
 
-   const teamMembers = [
-     { id: 1, name: 'Sophie M.', role: 'Designer', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-     { id: 2, name: 'Thomas D.', role: 'Dev', avatar: 'https://randomuser.me/api/portraits/men/86.jpg' },
-     { id: 3, name: 'Emma L.', role: 'PM', avatar: 'https://randomuser.me/api/portraits/women/24.jpg' },
-   ];
+  const recentActivities: Activity[] = [
+    { id: 1, title: 'Réunion équipe design', time: '14:00', type: 'meeting' },
+    { id: 2, title: 'Mise à jour dashboard v2', time: '11:30', type: 'update' },
+    { id: 3, title: 'Review code frontend', time: '09:15', type: 'task' },
+  ];
 
-   return (
-     <div className="flex-grow p-[20px] bg-gray900 rounded-lg shadow-md">
-       <div className="grid grid-cols1 md:grid-cols2 lg:grid-cols3 gap-[20px]">
-         {/* Quick Stats */}
-         <div className="col-span-full md:grid md:grid-cols3 md:grid-flow-row gap-[20px]">
-           {quickStats.map((stat, index) => (
-             <QuickStat key={index} {...stat} />
-           ))}
-         </div>
-
-         {/* Performance Chart */}
-         {/* Your performance chart code remains unchanged */}
-
-         {/* Calendar */}
-         {/* Your calendar code remains unchanged */}
-
-         {/* Team Members */}
-         <div className="bg-gray800 rounded-lg p-[20px] shadow-md col-span-full md:w-full lg:w-auto">
-           <h2 className="font-semibold text-white mb-[10px] flex items-center">
-             <UserGroupIcon className="h-[24px] w-[24px] mr-[5px]" /> Équipe
-           </h2>
-           <ul className="space-y-[10px]">
-             {teamMembers.map((member) => (
-               <li key={member.id} className="flex items-center justify-between">
-                 <div className="flex items-center">
-                   <Image src={member.avatar} alt={member.name} width={30} height={30} className="rounded-full mr-[10px]" />
-                   <span className="text-gray300">{member.name}</span>
-                 </div>
-                 <span className="text-gray400">{member.role}</span>
-               </li>
-             ))}
-           </ul>
-         </div>
-       </div>
-
-       {/* Nickname Modal */}
-       {showNicknameModal && (
-         <NicknameModal 
-           onClose={() => setShowNicknameModal(false)} 
-           onNicknameSet={(nickname) => setUser(prev => ({ ...prev!, nickname }))} 
-         />
-       )}
-     
-     </div>
-   );
-}
-
-function QuickStat({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
   return (
-    <div className={`bg-gradient-to-br ${color} rounded-lg p-[10px] flex flex-col justify-between`}>
-      <div className="flex justify-between items-center mb-[5px]">
-        <h2 className="font-semibold text-white">{title}</h2>
-        {icon}
+    <div className="p-6 bg-zinc-900 min-h-screen">
+      {/* Header Section */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-100">Tableau de Bord</h1>
+          <p className="text-zinc-400">Bienvenue, {user.nickname || user.user_metadata.full_name}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <Bell className="h-5 w-5" />
+          </button>
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-zinc-800">
+            <Image
+              src={user.user_metadata.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'}
+              alt="Profile"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+            <span className="text-zinc-100">{user.nickname || user.user_metadata.full_name}</span>
+          </div>
+        </div>
       </div>
-      <p className="text-lg font-bold text-white">{value}</p>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {quickStats.map((stat, index) => (
+          <div
+            key={index}
+            className={`bg-gradient-to-br ${stat.color} rounded-xl p-6 text-white shadow-lg`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <stat.icon className="h-6 w-6 opacity-80" />
+              <span className="text-2xl font-bold">{stat.value}</span>
+            </div>
+            <h3 className="text-sm font-medium opacity-90">{stat.title}</h3>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Team Section */}
+        <div className="lg:col-span-2 bg-zinc-800/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Équipe
+            </h2>
+            <button className="text-zinc-400 hover:text-zinc-100 text-sm">Voir tout</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {teamMembers.map((member) => (
+              <div key={member.id} className="bg-zinc-800 rounded-lg p-4 flex flex-col items-center text-center">
+                <Image
+                  src={member.avatar}
+                  alt={member.name}
+                  width={64}
+                  height={64}
+                  className="rounded-full mb-3"
+                />
+                <h3 className="text-zinc-100 font-medium">{member.name}</h3>
+                <p className="text-zinc-400 text-sm">{member.role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Activities Section */}
+        <div className="bg-zinc-800/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Activités Récentes
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800">
+                <div className="flex-shrink-0">
+                  {activity.type === 'meeting' && <Calendar className="h-5 w-5 text-blue-500" />}
+                  {activity.type === 'update' && <TrendingUp className="h-5 w-5 text-green-500" />}
+                  {activity.type === 'task' && <CheckSquare className="h-5 w-5 text-amber-500" />}
+                </div>
+                <div className="flex-grow">
+                  <h4 className="text-zinc-100 text-sm">{activity.title}</h4>
+                  <p className="text-zinc-400 text-xs">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {showNicknameModal && (
+        <NicknameModal
+          onClose={() => setShowNicknameModal(false)}
+          onNicknameSet={(nickname) => setUser(prev => ({ ...prev!, nickname }))}
+        />
+      )}
     </div>
   );
 }
