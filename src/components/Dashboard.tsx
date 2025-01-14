@@ -131,14 +131,14 @@ export default function Dashboard() {
    );
 }
 
-function QuickStat({ title, value, icon, color }: { title:string; value:string; icon:any; color:string }) {
-   return (
-     <div className={`bg-gradient-to-br ${color} rounded-lg p-[10px] flex flex-col justify-between`}>
-       <div className="flex justify-between items-center mb-[5px]">
-         <h2 className="font-semibold text-white">{title}</h2>
-         {icon}
-       </div>
-       <p className="text-lg font-bold text-white">{value}</p>
-     </div>
-   );
+function QuickStat({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
+  return (
+    <div className={`bg-gradient-to-br ${color} rounded-lg p-[10px] flex flex-col justify-between`}>
+      <div className="flex justify-between items-center mb-[5px]">
+        <h2 className="font-semibold text-white">{title}</h2>
+        {icon}
+      </div>
+      <p className="text-lg font-bold text-white">{value}</p>
+    </div>
+  );
 }
