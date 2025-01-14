@@ -35,12 +35,14 @@ export default function Dashboard() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Fetch user profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('nickname, avatar_url')
           .eq('id', user.id)
           .single();
 
+        // Set user state
         setUser({ 
           ...user, 
           nickname: profile?.nickname,
@@ -49,6 +51,11 @@ export default function Dashboard() {
             full_name: user.user_metadata.full_name,
           }
         });
+
+        // Show modal if nickname is not set
+        if (!profile) {
+          setShowNicknameModal(true);
+        }
       } else {
         router.push('/login');
       }
@@ -57,6 +64,7 @@ export default function Dashboard() {
 
     getUser();
   }, [supabase, router]);
+  
 
   if (loading) {
     return (

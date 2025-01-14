@@ -11,15 +11,23 @@ export default function NicknameModal({ onClose, onNicknameSet }: { onClose: () 
     const { data: { user } } = await supabase.auth.getUser();
     
     if (user) {
-      await supabase.from('profiles').upsert({
+      // Upsert the profile
+      const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         nickname: nickname,
-        avatar_url: user.user_metadata.avatar_url
+        avatar_url: user.user_metadata.avatar_url || null // Use existing avatar URL or null
       });
+  
+      if (error) {
+        console.error('Error saving nickname:', error.message);
+        return;
+      }
+      
       onNicknameSet(nickname); // Update nickname in the dashboard
+      onClose(); // Close modal after saving
     }
-    onClose();
   };
+  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
