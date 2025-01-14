@@ -73,7 +73,7 @@ export default function Dashboard() {
   const quickStats = [
     { title: "Projets", value: "12", icon: <RectangleStackIcon className="h-6 w-6" />, color: "from-purple-600 to-indigo-700" },
     { title: "Tâches", value: "28", icon: <ClipboardDocumentListIcon className="h-6 w-6" />, color: "from-green-500 to-emerald700" },
-    { title: "Messages", value: "5", icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />, color: "from-pink-500 to-rose-700" },
+    { title: "Messages", value: "5", icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />, color: "from-pink-500 to-rose700" },
   ];
 
    // Your performanceData and calendarEvents remain unchanged

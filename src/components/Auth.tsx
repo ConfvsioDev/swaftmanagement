@@ -1,8 +1,9 @@
 // src/components/Auth.tsx
 'use client'
 
-import { Auth } from '@supabase/auth-ui-react'; // Keep this if you plan to use it
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+// Remove Auth import if not used
+// import { Auth } from '@supabase/auth-ui-react'; 
 
 export default function AuthComponent() {
   const supabase = createClientComponentClient();
