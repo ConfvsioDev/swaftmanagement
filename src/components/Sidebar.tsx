@@ -21,7 +21,6 @@ import { usePathname } from 'next/navigation';
 
 const sidebarItems = [
   { icon: Home, label: 'Accueil', href: '/' },
-  { icon: BarChart3, label: 'Tableau de Bord', href: '/dashboard' },
   { icon: Calendar, label: 'Calendrier', href: '/calendar' },
   { icon: Users, label: 'Équipe', href: '/team' },
   { icon: Settings, label: 'Paramètres', href: '/settings' },
