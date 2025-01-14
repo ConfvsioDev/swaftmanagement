@@ -1,10 +1,11 @@
+// src/components/Auth.tsx
 'use client'
 
-import { Auth } from '@supabase/auth-ui-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Auth } from '@supabase/auth-ui-react'; // Keep this if you plan to use it
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function AuthComponent() {
-  const supabase = createClientComponentClient()
+  const supabase = createClientComponentClient();
 
   return (
     <div className="max-w-md mx-auto">
@@ -26,7 +27,9 @@ export default function AuthComponent() {
             Connexion avec Discord
           </button>
         </div>
+        {/* Uncomment below if you want to use Auth component */}
+        {/* <Auth supabaseClient={supabase} /> */}
       </div>
     </div>
-  )
+  );
 }

@@ -1,9 +1,10 @@
+// src/components/Sidebar.tsx
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cn } from '@/lib/utils'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import React, { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Home,
   BarChart3,
@@ -13,9 +14,10 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-} from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+} from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image'; // Import Image
+import { usePathname } from 'next/navigation';
 
 const sidebarItems = [
   { icon: Home, label: 'Accueil', href: '/' },
@@ -23,31 +25,32 @@ const sidebarItems = [
   { icon: Calendar, label: 'Calendrier', href: '/calendar' },
   { icon: Users, label: 'Équipe', href: '/team' },
   { icon: Settings, label: 'Paramètres', href: '/settings' },
-]
+];
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState<{
-    avatar_url?: string
-    nickname?: string
-    email?: string
+    avatar_url?: string;
+    nickname?: string;
+    email?: string;
     user_metadata?: {
-      full_name?: string
-      avatar_url?: string
-    }
-  } | null>(null)
-  const pathname = usePathname()
-  const supabase = createClientComponentClient()
+      full_name?: string;
+      avatar_url?: string;
+    };
+  } | null>(null);
+  
+  const pathname = usePathname();
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('nickname, avatar_url')
           .eq('id', user.id)
-          .single()
+          .single();
 
         setUser({
           ...user,
@@ -56,12 +59,12 @@ const Sidebar = () => {
             avatar_url: profile?.avatar_url || user.user_metadata.avatar_url,
             full_name: user.user_metadata.full_name,
           },
-        })
+        });
       }
-    }
+    };
 
-    fetchUserData()
-  }, [supabase])
+    fetchUserData();
+  }, [supabase]);
 
   return (
     <aside className={cn(
@@ -91,7 +94,7 @@ const Sidebar = () => {
       <ScrollArea className="flex-1 px-2">
         <nav className="space-y-1.5 py-4">
           {sidebarItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
@@ -107,7 +110,7 @@ const Sidebar = () => {
                 <item.icon className="h-5 w-5" />
                 {!collapsed && <span>{item.label}</span>}
               </Link>
-            )
+            );
           })}
         </nav>
       </ScrollArea>
@@ -117,10 +120,12 @@ const Sidebar = () => {
           "flex items-center gap-x-3",
           collapsed && "justify-center"
         )}>
-          <img
+          <Image
             src={user?.user_metadata?.avatar_url || '/default-avatar.png'}
             alt="User avatar"
-            className="w-9 h-9 rounded-full border border-zinc-800/40"
+            width={36}
+            height={36}
+            className="rounded-full border border-zinc-800/40"
           />
           {!collapsed && (
             <div className="flex flex-col">
@@ -145,7 +150,7 @@ const Sidebar = () => {
         </button>
       </div>
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
