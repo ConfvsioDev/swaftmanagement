@@ -101,7 +101,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-6 bg-zinc-900 min-h-screen">
+    <div className="p-6 bg-zinc-900 flex-grow">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-8">
         <div>

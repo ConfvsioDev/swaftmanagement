@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className="flex h-screen bg-gray-900 text-gray-200">
+      <body className="flex h-screen bg-zinc-900 text-gray-200">
         <Sidebar /> {/* Sidebar handles its own user fetching */}
         <div className="flex-grow flex flex-col">
           <main className="flex-grow p-6 overflow-y-auto">
