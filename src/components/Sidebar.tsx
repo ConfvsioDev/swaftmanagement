@@ -85,7 +85,7 @@ const Sidebar = () => {
         "fixed left-0 top-0 h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 border-r border-zinc-800/40 pt-16 flex flex-col transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}>
-      <div className="px-4 py-2 flex items-center justify-between">
+      <div className="px-4 py-4 flex items-center justify-between">
         <h1 className={cn(
           "font-bold text-zinc-100 transition-all duration-300 ",
           collapsed ? "text-center text-xl" : "text-2xl "
