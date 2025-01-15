@@ -380,7 +380,7 @@ const ChatIcon: React.FC = () => {
                                     type="submit"
                                     className="text-blue-500 hover:text-blue-400 text-sm"
                                   >
-                                    Save
+                                    Sauvegarder
                                   </button>
                                   <button
                                     type="button"
@@ -390,7 +390,7 @@ const ChatIcon: React.FC = () => {
                                     }}
                                     className="text-zinc-500 hover:text-zinc-400 text-sm"
                                   >
-                                    Cancel
+                                    Annuler
                                   </button>
                                 </form>
                               ) : (
