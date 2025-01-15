@@ -114,12 +114,12 @@ const ChatIcon: React.FC = () => {
 
   const fetchMessages = useCallback(async () => {
     if (!activeRoom) return;
-
-    const { data } = await supabase
+  
+    const { data, error } = await supabase
       .from('messages')
       .select(`
         *,
-        profiles:user_id (
+        user:user_id (
           nickname,
           avatar_url
         )
@@ -127,13 +127,18 @@ const ChatIcon: React.FC = () => {
       .eq('room_id', activeRoom.id)
       .eq('private', activeTab === 'private')
       .order('created_at', { ascending: true });
-
+  
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return;
+    }
+  
     if (data) {
       const formattedMessages: Message[] = data.map((message) => ({
         ...message,
         user: {
-          nickname: message.profiles?.nickname || 'Anonyme',
-          avatar_url: message.profiles?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
+          nickname: message.user?.nickname || 'Anonyme',
+          avatar_url: message.user?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
         },
       }));
       setMessages(formattedMessages);
