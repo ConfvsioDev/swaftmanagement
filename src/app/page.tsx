@@ -1,10 +1,6 @@
-import RootLayout from './layout';
+// page.tsx
 import Dashboard from '@/components/Dashboard';
 
-export default async function Home() {
-  return (
-    <RootLayout>
-      <Dashboard />
-    </RootLayout>
-  );
+export default function Home() {
+  return <Dashboard />;
 }

@@ -1,3 +1,4 @@
+// Dashboard.tsx
 'use client'
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -73,7 +74,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -101,87 +102,86 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="w-[calc(100vw-24rem)] max-w-7xl h-[calc(100vh-4rem)] bg-zinc-900 rounded-xl overflow-hidden">
-      <div className="h-full overflow-y-auto px-6 py-6">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-100">Tableau de Bord</h1>
-            <p className="text-zinc-400">Bienvenue, {user.nickname || user.user_metadata.full_name}</p>
-          </div>
-          <div className="flex items-center">
-            <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
-              <Bell className="h-5 w-5" />
-            </button>
-          </div>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header Section */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-100">Tableau de Bord</h1>
+          <p className="text-zinc-400">Bienvenue, {user.nickname || user.user_metadata.full_name}</p>
         </div>
+        <div className="flex items-center">
+          <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <Bell className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {quickStats.map((stat, index) => (
-            <div
-              key={index}
-              className={`bg-gradient-to-br ${stat.color} rounded-xl p-6 text-white shadow-lg`}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <stat.icon className="h-6 w-6 opacity-80" />
-                <span className="text-2xl font-bold">{stat.value}</span>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {quickStats.map((stat, index) => (
+          <div
+            key={index}
+            className={`bg-gradient-to-br ${stat.color} rounded-xl p-6 text-white shadow-lg`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <stat.icon className="h-6 w-6 opacity-80" />
+              <span className="text-2xl font-bold">{stat.value}</span>
+            </div>
+            <h3 className="text-sm font-medium opacity-90">{stat.title}</h3>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Team Section */}
+        <div className="lg:col-span-2 bg-zinc-800/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Équipe
+            </h2>
+            <button className="text-zinc-400 hover:text-zinc-100 text-sm">Voir tout</button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {teamMembers.map((member) => (
+              <div key={member.id} className="bg-zinc-800 rounded-lg p-4 flex flex-col items-center text-center">
+                <Image
+                  src={member.avatar}
+                  alt={member.name}
+                  width={64}
+                  height={64}
+                  className="rounded-full mb-3"
+                />
+                <h3 className="text-zinc-100 font-medium">{member.name}</h3>
+                <p className="text-zinc-400 text-sm">{member.role}</p>
               </div>
-              <h3 className="text-sm font-medium opacity-90">{stat.title}</h3>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Team Section */}
-          <div className="lg:col-span-2 bg-zinc-800/50 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Équipe
-              </h2>
-              <button className="text-zinc-400 hover:text-zinc-100 text-sm">Voir tout</button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {teamMembers.map((member) => (
-                <div key={member.id} className="bg-zinc-800 rounded-lg p-4 flex flex-col items-center text-center">
-                  <Image
-                    src={member.avatar}
-                    alt={member.name}
-                    width={64}
-                    height={64}
-                    className="rounded-full mb-3"
-                  />
-                  <h3 className="text-zinc-100 font-medium">{member.name}</h3>
-                  <p className="text-zinc-400 text-sm">{member.role}</p>
-                </div>
-              ))}
-            </div>
+        {/* Activities Section */}
+        <div className="bg-zinc-800/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Activités Récentes
+            </h2>
           </div>
-
-          {/* Activities Section */}
-          <div className="bg-zinc-800/50 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Activités Récentes
-              </h2>
-            </div>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800">
-                  <div className="flex-shrink-0">
-                    {activity.type === 'meeting' && <Calendar className="h-5 w-5 text-blue-500" />}
-                    {activity.type === 'update' && <TrendingUp className="h-5 w-5 text-green-500" />}
-                    {activity.type === 'task' && <CheckSquare className="h-5 w-5 text-amber-500" />}
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-zinc-100 text-sm">{activity.title}</h4>
-                    <p className="text-zinc-400 text-xs">{activity.time}</p>
-                  </div>
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800">
+                <div className="flex-shrink-0">
+                  {activity.type === 'meeting' && <Calendar className="h-5 w-5 text-blue-500" />}
+                  {activity.type === 'update' && <TrendingUp className="h-5 w-5 text-green-500" />}
+                  {activity.type === 'task' && <CheckSquare className="h-5 w-5 text-amber-500" />}
                 </div>
-              ))}
-            </div>
+                <div className="flex-grow">
+                  <h4 className="text-zinc-100 text-sm">{activity.title}</h4>
+                  <p className="text-zinc-400 text-xs">{activity.time}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
