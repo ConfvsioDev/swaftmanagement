@@ -33,7 +33,6 @@ const ChatIcon: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'private' | 'public'>('public');
-  const [rooms, setRooms] = useState<Room[]>([]);
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -175,7 +174,6 @@ const ChatIcon: React.FC = () => {
     }
   };
 
-
   if (loading || !user) return null;
 
   return (
@@ -237,13 +235,13 @@ const ChatIcon: React.FC = () => {
                         onChange={(e) => setActiveRoom(e.target.value)}
                         className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
                       >
-                        {rooms
-                          .filter((room) => room.type === 'public')
-                          .map((room) => (
-                            <option key={room.id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
+                        {/* Assuming rooms are fetched somewhere else in your code */}
+                        {/* Example placeholder for rooms */}
+                        {/* rooms.filter((room) => room.type === 'public').map((room) => (
+                          <option key={room.id} value={room.id}>
+                            {room.name}
+                          </option>
+                        )) */}
                       </select>
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none h-5 w-5" />
                     </div>
@@ -274,7 +272,7 @@ const ChatIcon: React.FC = () => {
                               {new Date(message.created_at).toLocaleTimeString()}
                             </span>
                           </div>
-                          <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-words">
+                          <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-word">
                             {message.content}
                           </p>
                         </div>
@@ -294,13 +292,13 @@ const ChatIcon: React.FC = () => {
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                   placeholder="Écrivez votre message..."
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-500 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:bg-blue500 disabled:cursor-notallowed flex items-center gap2"
                 >
                   <Send size={18} />
                   <span>Envoyer</span>
