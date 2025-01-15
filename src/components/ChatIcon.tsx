@@ -453,7 +453,7 @@ const ChatIcon: React.FC = () => {
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           className="flex-grow bg-zinc-800 text-white px-4 py-2.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-zinc-500"
-                          placeholder="Écrivez votre message..."
+                          placeholder="Écris ton message..."
                         />
                         <button
                           type="submit"
@@ -467,7 +467,7 @@ const ChatIcon: React.FC = () => {
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc500">Sélectionnez un salon pour commencer à discuter</p>
+                    <p className="text-zinc500">Sélectionne un salon pour commencer à discuter</p>
                   </div>
                 )}
               </div>
