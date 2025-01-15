@@ -3,6 +3,7 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FaDiscord } from 'react-icons/fa'; // Make sure to install react-icons
 import Image from 'next/image'; // Import Image from Next.js
+import logo from '../../public/logo.png';
 
 export default function AuthComponent() {
   const supabase = createClientComponentClient();
@@ -12,13 +13,13 @@ export default function AuthComponent() {
       <div className="bg-zinc-800 rounded-xl p-8 shadow-2xl border border-zinc-700">
         {/* Logo Section */}
         <div className="flex justify-center mb-6">
-          <Image
-            src="../../public/logo.png" // Correct path to the logo
-            alt="Swaft Logo"
-            width={80} // Adjust width and height as needed
-            height={80}
-            className="rounded-full border border-zinc-600"
-          />
+        <Image
+          src={logo}
+          alt="Swaft Logo"
+          width={80}
+          height={80}
+          className="rounded-full border border-zinc-600"
+        />
         </div>
 
         <h2 className="text-2xl font-bold text-center mb-6 text-zinc-100">Bienvenue sur Swaft</h2>
