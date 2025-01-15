@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const sidebarItems = [
   { icon: Home, label: 'Accueil', href: '/' },
@@ -26,47 +26,56 @@ const sidebarItems = [
 ];
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [user, setUser] = useState<{
-    avatar_url?: string;
-    nickname?: string;
-    email?: string;
-    user_metadata?: {
-      full_name?: string;
+    const [collapsed, setCollapsed] = useState(false);
+    const [user, setUser] = useState<{
       avatar_url?: string;
-    };
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
+      nickname?: string;
+      email?: string;
+      user_metadata?: {
+        full_name?: string;
+        avatar_url?: string;
+      };
+    } | null>(null);
+    const [loading, setLoading] = useState(true);
+    
+    const pathname = usePathname();
+    const router = useRouter();
+    const supabase = createClientComponentClient();
   
-  const pathname = usePathname();
-  const supabase = createClientComponentClient();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('nickname, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        setUser({
-          ...user,
-          nickname: profile?.nickname,
-          user_metadata: {
-            avatar_url: profile?.avatar_url || user.user_metadata.avatar_url,
-            full_name: user.user_metadata.full_name,
-          },
-        });
+    useEffect(() => {
+      const fetchUserData = async () => {
+        setLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('nickname, avatar_url')
+            .eq('id', user.id)
+            .single();
+  
+          setUser({
+            ...user,
+            nickname: profile?.nickname,
+            user_metadata: {
+              avatar_url: profile?.avatar_url || user.user_metadata.avatar_url,
+              full_name: user.user_metadata.full_name,
+            },
+          });
+        }
+        setLoading(false);
+      };
+  
+      fetchUserData();
+    }, [supabase]);
+  
+    const handleLogout = async () => {
+      try {
+        await supabase.auth.signOut();
+        router.push('/login'); // Redirect to login page after logout
+      } catch (error) {
+        console.error('Error logging out:', error);
       }
-      setLoading(false);
     };
-
-    fetchUserData();
-  }, [supabase]);
-
   if (loading) {
     return <div>Loading...</div>; // Or a more sophisticated loading indicator
   }
@@ -144,6 +153,7 @@ const Sidebar = () => {
           )}
         </div>
         <button
+          onClick={handleLogout}
           className={cn(
             "mt-4 flex items-center gap-x-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 w-full",
             "text-red-400 hover:bg-red-500/10 hover:text-red-300",
