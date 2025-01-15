@@ -19,3 +19,44 @@ body {
 .bg-zinc-900 {
   background-color: rgb(var(--background));
 }
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  /* Webkit browsers (Chrome, Safari, newer Edge) */
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: rgb(var(--background));
+    border-radius: 4px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary) / 0.3);
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--primary) / 0.5);
+  }
+
+  /* Firefox */
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--primary) / 0.3) rgb(var(--background));
+  }
+
+  /* Hide scrollbar when not hovering */
+  .scrollbar-custom {
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+    
+    &:hover::-webkit-scrollbar-thumb {
+      background: rgb(var(--primary) / 0.3);
+    }
+  }
+}
