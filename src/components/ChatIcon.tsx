@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageSquare, X, Send, ChevronDown } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
@@ -41,13 +41,13 @@ const ChatIcon: React.FC = () => {
 
   const supabase = createClientComponentClient();
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -74,16 +74,39 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
-  const fetchRooms = async () => {
-    const { data } = await supabase
-      .from('rooms')
-      .select('id, name, type')
-      .order('name');
-    if (data) {
-      setRooms(data);
-      setActiveRoom(data[0]?.id || null);
-    }
-  };
+  const fetchMessages = useCallback(
+    async (roomId: string) => {
+      const { data } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          profiles!messages_user_id_fkey (
+            nickname,
+            avatar_url
+          )
+        `)
+        .eq('room_id', roomId)
+        .order('created_at', { ascending: true });
+
+      if (data) {
+        const formattedMessages: Message[] = data.map((message) => ({
+          id: message.id,
+          content: message.content,
+          created_at: message.created_at,
+          user_id: message.user_id,
+          user: {
+            nickname: message.profiles[0]?.nickname || 'Anonymous',
+            avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
+          },
+        }));
+        setMessages(formattedMessages);
+      }
+    },
+    [supabase]
+  );
 
   useEffect(() => {
     if (activeRoom) {
@@ -129,38 +152,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom]);
-
-  const fetchMessages = async (roomId: string) => {
-    const { data } = await supabase
-      .from('messages')
-      .select(`
-        id,
-        content,
-        created_at,
-        user_id,
-        profiles!messages_user_id_fkey (
-          nickname,
-          avatar_url
-        )
-      `)
-      .eq('room_id', roomId)
-      .order('created_at', { ascending: true });
-
-    if (data) {
-      const formattedMessages: Message[] = data.map((message) => ({
-        id: message.id,
-        content: message.content,
-        created_at: message.created_at,
-        user_id: message.user_id,
-        user: {
-          nickname: message.profiles[0]?.nickname || 'Anonymous',
-          avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
-        },
-      }));
-      setMessages(formattedMessages);
-    }
-  };
+  }, [activeRoom, fetchMessages, supabase]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -182,6 +174,7 @@ const ChatIcon: React.FC = () => {
       console.error('Error sending message:', error);
     }
   };
+
 
   if (loading || !user) return null;
 
