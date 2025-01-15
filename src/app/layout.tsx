@@ -6,6 +6,12 @@ import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Session } from '@supabase/supabase-js';
 
+export const metadata = {
+  title: "Gestion Swaft",
+  description: "Outils de Gestion de Swaft",
+};
+
+
 export default function RootLayout({
   children,
 }: {
