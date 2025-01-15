@@ -5,17 +5,17 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, X, Send, Users, Globe } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User } from '@supabase/auth-helpers-nextjs';
+import Image from 'next/image'; // Import Next.js Image component
 
 type Message = {
-    id: string;
-    content: string;
-    created_at: string;
-    user: {
-      nickname: string;
-      avatar_url: string;
-    };
+  id: string;
+  content: string;
+  created_at: string;
+  user: {
+    nickname: string;
+    avatar_url: string;
   };
-  
+};
 
 type Room = {
   id: string;
@@ -31,7 +31,6 @@ const ChatIcon: React.FC = () => {
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const supabase = createClientComponentClient();
 
@@ -66,7 +65,7 @@ const ChatIcon: React.FC = () => {
   }, [activeRoom, supabase]);
 
   const fetchRooms = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('rooms')
       .select('id, name')
       .order('name');
@@ -77,7 +76,7 @@ const ChatIcon: React.FC = () => {
   };
 
   const fetchMessages = async (roomId: string) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('messages')
       .select(`
         id,
@@ -93,31 +92,24 @@ const ChatIcon: React.FC = () => {
         id: message.id,
         content: message.content,
         created_at: message.created_at,
-        user: {
-          nickname: message.user[0].nickname,
-          avatar_url: message.user[0].avatar_url
-        }
+        user: message.user[0], // Accessing the first user object directly
       }));
       setMessages(formattedMessages.reverse());
     }
   };
-  
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !activeRoom || !user) return;
 
-    const { data, error } = await supabase
+    await supabase
       .from('messages')
       .insert({
         room_id: activeRoom,
         user_id: user.id,
         content: newMessage
-      })
-      .select();
+      });
 
-    if (data) {
-      setNewMessage('');
-    }
+    setNewMessage('');
   };
 
   if (loading || !user) {
@@ -132,11 +124,6 @@ const ChatIcon: React.FC = () => {
         aria-label="Ouvrir le chat"
       >
         <MessageSquare size={24} />
-        {unreadCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-            {unreadCount}
-          </span>
-        )}
       </button>
 
       {isModalOpen && (
@@ -180,7 +167,7 @@ const ChatIcon: React.FC = () => {
                     {messages.map(message => (
                       <div key={message.id} className="bg-zinc-700 rounded-lg p-3">
                         <div className="flex items-center mb-1">
-                          <img src={message.user.avatar_url || '/default-avatar.png'} alt={message.user.nickname} className="w-6 h-6 rounded-full mr-2" />
+                          <Image src={message.user.avatar_url || '/default-avatar.png'} alt={message.user.nickname} width={24} height={24} className="rounded-full mr-2" />
                           <span className="font-semibold text-zinc-100">{message.user.nickname}</span>
                           <span className="text-xs text-zinc-400 ml-auto">{new Date(message.created_at).toLocaleTimeString()}</span>
                         </div>
@@ -198,7 +185,7 @@ const ChatIcon: React.FC = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  className="flex-1 bg-zinc-700 text-zinc-100 p-2 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="flex-1 bg-zinc-700 text-zinc-100 p-2 rounded-l-lg focus:outline-none focus:ring focus:ring-indigo-500"
                   placeholder="Tapez un message..."
                 />
                 <button
