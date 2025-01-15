@@ -3,14 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, ChevronDown } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { User } from '@supabase/auth-helpers-nextjs';
+import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
 
 type Message = {
   id: string;
   content: string;
   created_at: string;
-  user_id: string; // Added user_id property
+  user_id: string; // Ensure user_id is included
   user: {
     nickname: string;
     avatar_url: string;
@@ -23,9 +23,15 @@ type Room = {
   type: 'public' | 'private';
 };
 
+// Extend Supabase User type to include additional properties
+type UserProfile = SupabaseUser & {
+  nickname?: string;
+  avatar_url?: string;
+};
+
 const ChatIcon: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'private' | 'public'>('public');
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -44,13 +50,27 @@ const ChatIcon: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Fetch user data and profile on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
       if (user) {
-        await fetchRooms();
+        // Fetch user profile data
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('nickname, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        // Update user state with profile information
+        setUser({
+          ...user,
+          nickname: profile?.nickname || 'Anonymous',
+          avatar_url: profile?.avatar_url || '/default-avatar.png',
+        });
+      } else {
+        setUser(null); // Handle case where no user is logged in
       }
       setLoading(false);
     };
@@ -58,6 +78,7 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
+  // Fetch rooms from the database
   const fetchRooms = async () => {
     const { data } = await supabase
       .from('rooms')
@@ -69,6 +90,7 @@ const ChatIcon: React.FC = () => {
     }
   };
 
+  // Fetch messages for the active room and subscribe to new messages
   useEffect(() => {
     if (activeRoom) {
       fetchMessages(activeRoom);
@@ -93,7 +115,7 @@ const ChatIcon: React.FC = () => {
               id: newMessageData.id,
               content: newMessageData.content,
               created_at: newMessageData.created_at,
-              user_id: newMessageData.user_id, // Include user_id
+              user_id: newMessageData.user_id,
               user: {
                 nickname: profile.nickname || 'Anonymous',
                 avatar_url: profile.avatar_url || '/default-avatar.png'
@@ -109,6 +131,7 @@ const ChatIcon: React.FC = () => {
     }
   }, [activeRoom]); // Add activeRoom to dependencies
 
+  // Fetch messages for a specific room
   const fetchMessages = async (roomId: string) => {
     const { data } = await supabase
       .from('messages')
@@ -130,7 +153,7 @@ const ChatIcon: React.FC = () => {
         id: message.id,
         content: message.content,
         created_at: message.created_at,
-        user_id: message.user_id, // Include user_id here
+        user_id: message.user_id,
         user: {
           nickname: message.profiles[0]?.nickname || 'Anonymous',
           avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
@@ -140,6 +163,7 @@ const ChatIcon: React.FC = () => {
     }
   };
 
+  // Handle sending a new message
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
