@@ -41,6 +41,16 @@ const ChatIcon: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClientComponentClient();
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editedContent, setEditedContent] = useState('');
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Add this function to handle initial scroll
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -182,6 +192,36 @@ const ChatIcon: React.FC = () => {
       console.error('Error sending message:', error);
     }
   };
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ content: newContent })
+        .eq('id', messageId);
+  
+      if (error) throw error;
+      
+      setEditingMessageId(null);
+      setEditedContent('');
+      await fetchMessages(); // Refresh messages
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+  };
+  
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId);
+  
+      if (error) throw error;
+      await fetchMessages(); // Refresh messages
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
 
   if (loading || !user) return null;
 
@@ -266,55 +306,116 @@ const ChatIcon: React.FC = () => {
               <div className="flex-grow flex flex-col">
                 {activeRoom ? (
                   <>
-                    <div className="flex-grow overflow-y-auto p4 space-y4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex items-start gap-4 p-4 ${
-                          message.user_id === user.id ? 'flex-row-reverse' : ''
-                        }`}
-                      >
-                        <div className="flex-shrink-0">
-                          <Image
-                            src={message.user.avatar_url}
-                            alt={message.user.nickname}
-                            width={40}
-                            height={40}
-                            className="rounded-full border-2 border-zinc-700"
-                          />
-                        </div>
+                    <div className="flex-grow overflow-y-auto p-4 space-y-4" ref={messagesContainerRef}>
+                      {messages.map((message) => (
                         <div
-                          className={`flex flex-col max-w-[70%] ${
-                            message.user_id === user.id ? 'items-end' : 'items-start'
+                          key={message.id}
+                          className={`group flex items-start gap-4 p-4 ${
+                            message.user_id === user.id ? 'flex-row-reverse' : ''
                           }`}
                         >
-                          <div className={`flex items-center gap-2 mb-1 ${
-                            message.user_id === user.id ? 'flex-row-reverse' : ''
-                          }`}>
-                            <span className="font-medium text-zinc-100 text-sm">
-                              {message.user.nickname}
-                            </span>
-                            <span className="text-xs text-zinc-500">
-                              {new Date(message.created_at).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
+                          <div className="flex-shrink-0">
+                            <Image
+                              src={message.user.avatar_url}
+                              alt={message.user.nickname}
+                              width={40}
+                              height={40}
+                              className="rounded-full border-2 border-zinc-700"
+                            />
                           </div>
                           <div
-                            className={`rounded-lg py-2 px-4 ${
-                              message.user_id === user.id
-                                ? 'bg-blue-600 text-white rounded-tr-none'
-                                : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
+                            className={`flex flex-col max-w-[70%] ${
+                              message.user_id === user.id ? 'items-end' : 'items-start'
                             }`}
                           >
-                            <p className="text-sm leading-relaxed break-words">
-                              {message.content}
-                            </p>
+                            <div className={`flex items-center gap-2 mb-1 ${
+                              message.user_id === user.id ? 'flex-row-reverse' : ''
+                            }`}>
+                              <span className="font-medium text-zinc-100 text-sm">
+                                {message.user.nickname}
+                              </span>
+                              <span className="text-xs text-zinc-500">
+                                {new Date(message.created_at).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <div className="relative">
+                              {editingMessageId === message.id ? (
+                                <form 
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleEditMessage(message.id, editedContent);
+                                  }}
+                                  className="flex gap-2"
+                                >
+                                  <input
+                                    type="text"
+                                    value={editedContent}
+                                    onChange={(e) => setEditedContent(e.target.value)}
+                                    className="bg-zinc-800 text-white px-3 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 text-sm"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="text-blue-500 hover:text-blue-400 text-sm"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingMessageId(null);
+                                      setEditedContent('');
+                                    }}
+                                    className="text-zinc-500 hover:text-zinc-400 text-sm"
+                                  >
+                                    Cancel
+                                  </button>
+                                </form>
+                              ) : (
+                                <>
+                                  <div
+                                    className={`rounded-lg py-2 px-4 ${
+                                      message.user_id === user.id
+                                        ? 'bg-blue-600 text-white rounded-tr-none'
+                                        : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
+                                    }`}
+                                  >
+                                    <p className="text-sm leading-relaxed break-words">
+                                      {message.content}
+                                    </p>
+                                  </div>
+                                  {message.user_id === user.id && (
+                                    <div className={`absolute top-0 ${message.user_id === user.id ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'} flex gap-2 px-2 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                                      <button
+                                        onClick={() => {
+                                          setEditingMessageId(message.id);
+                                          setEditedContent(message.content);
+                                        }}
+                                        className="text-zinc-400 hover:text-zinc-200"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteMessage(message.id)}
+                                        className="text-zinc-400 hover:text-red-400"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                       <div ref={messagesEndRef} />
                     </div>
 

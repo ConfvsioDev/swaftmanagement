@@ -83,10 +83,10 @@ export default function Dashboard() {
   if (!user) return null;
 
   const quickStats = [
-    { title: "Projets Actifs", value: "12", icon: LayoutGrid, color: "from-violet-600 to-violet-800" },
-    { title: "Tâches", value: "28", icon: CheckSquare, color: "from-emerald-600 to-emerald-800" },
-    { title: "Messages", value: "15", icon: MessageSquare, color: "from-blue-600 to-blue-800" },
-    { title: "Performance", value: "+24%", icon: TrendingUp, color: "from-amber-600 to-amber-800" },
+    { title: "Projets Actifs", value: "99", icon: LayoutGrid, color: "from-violet-600 to-violet-800" },
+    { title: "Tâches", value: "99", icon: CheckSquare, color: "from-emerald-600 to-emerald-800" },
+    { title: "Messages", value: "99", icon: MessageSquare, color: "from-blue-600 to-blue-800" },
+    { title: "JSP", value: "", icon: MessageSquare, color: "from-amber-600 to-amber-800" },
   ];
 
   const teamMembers = [
