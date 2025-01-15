@@ -116,17 +116,17 @@ const ChatIcon: React.FC = () => {
     if (!activeRoom) return;
   
     const { data, error } = await supabase
-      .from('messages')
-      .select(`
-        *,
-        user:user_id (
-          nickname,
-          avatar_url
-        )
-      `)
-      .eq('room_id', activeRoom.id)
-      .eq('private', activeTab === 'private')
-      .order('created_at', { ascending: true });
+  .from('messages')
+  .select(`
+    *,
+    profiles:user_id (
+      nickname,
+      avatar_url
+    )
+  `)
+  .eq('room_id', activeRoom.id)
+  .eq('private', activeTab === 'private')
+  .order('created_at', { ascending: true });
   
     if (error) {
       console.error('Error fetching messages:', error);
