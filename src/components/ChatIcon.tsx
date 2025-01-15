@@ -40,7 +40,7 @@ const ChatIcon: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages, scrollToBottom]); // Ensure scrollToBottom is included
 
   useEffect(() => {
     const fetchUserData = async () => {
