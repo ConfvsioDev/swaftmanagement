@@ -1,14 +1,35 @@
 // src/components/ChatIcon.tsx
 'use client'
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { FaComments } from 'react-icons/fa';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const ChatIcon: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+
+    fetchUserData();
+  }, [supabase]);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+
+  if (loading || !user) {
+    return null; // Don't render anything if loading or user is not logged in
+  }
 
   return (
     <>
