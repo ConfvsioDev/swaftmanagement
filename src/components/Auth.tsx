@@ -13,7 +13,7 @@ export default function AuthComponent() {
         {/* Logo Section */}
         <div className="flex justify-center mb-6">
           <Image
-            src="public/logo.png" // Correct path to the logo
+            src="../../public/logo.png" // Correct path to the logo
             alt="Swaft Logo"
             width={80} // Adjust width and height as needed
             height={80}
