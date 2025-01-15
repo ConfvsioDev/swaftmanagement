@@ -14,7 +14,7 @@ const ChatIcon: React.FC = () => {
     <>
       <button
         onClick={toggleModal}
-        className="fixed bottom-4 left-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+        className="fixed bottom-4 right-4 bg-zinc-950 text-white p-3 rounded-full shadow-lg hover:bg-zinc-900 transition-colors"
         aria-label="Open chat"
       >
         <FaComments size={24} />
