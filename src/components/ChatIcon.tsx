@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageSquare, X, Send, Hash, Lock } from 'lucide-react'; // Removed Plus
+import { MessageSquare, X, Send, Hash, Lock } from 'lucide-react'; 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -104,8 +104,8 @@ const ChatIcon: React.FC = () => {
         schema: 'public',
         table: 'messages',
         filter: `room_id=eq.${activeRoom.id}`,
-      }, (payload) => {
-        fetchMessages();
+      }, () => {
+        fetchMessages(); // Removed payload variable
       })
       .subscribe();
 
@@ -147,7 +147,7 @@ const ChatIcon: React.FC = () => {
     if (activeRoom) {
       fetchMessages();
     }
-  }, [activeRoom, fetchMessages]);
+  }, [activeRoom, fetchMessages]); // Added fetchMessages to dependencies
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -236,13 +236,13 @@ const ChatIcon: React.FC = () => {
                         className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 ${
                           activeRoom?.id === room.id
                             ? 'bg-blue-500/20 text-blue-400'
-                            : 'text-zinc-300 hover:bg-zinc-700/50'
+                            : 'text-zinc-300 hover:bg-zinc700/50'
                         }`}
                       >
                         {activeTab === 'public' ? (
-                          <Hash size={18} className="text-zinc-500" />
+                          <Hash size={18} className="text-zinc500" />
                         ) : (
-                          <Lock size={18} className="text-zinc-500" />
+                          <Lock size={18} className="text-zinc500" />
                         )}
                         <span className="truncate">{room.name}</span>
                       </button>
@@ -255,11 +255,11 @@ const ChatIcon: React.FC = () => {
               <div className="flex-grow flex flex-col">
                 {activeRoom ? (
                   <>
-                    <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                    <div className="flex-grow overflow-y-auto p4 space-y4">
                       {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex items-start gap-3 ${
+                          className={`flex items-start gap3 ${
                             message.user_id === user.id ? 'flex-row-reverse' : ''
                           }`}
                         >
@@ -273,16 +273,16 @@ const ChatIcon: React.FC = () => {
                           <div className={`flex flex-col ${
                             message.user_id === user.id ? 'items-end' : ''
                           }`}>
-                            <span className="font-medium text-zinc-100">
+                            <span className="font-medium text-zinc100">
                               {message.user.nickname}
                             </span>
-                            <span className="text-xs text-zinc-500">
+                            <span className="text-xs text-zinc500">
                               {new Date(message.created_at).toLocaleTimeString()}
                             </span>
-                            <p className={`text-zinc-300 rounded-lg py-2 px-3 mt-1 max-w-md ${
+                            <p className={`text-zinc300 rounded-lg py2 px3 mt1 max-w-md ${
                               message.user_id === user.id
-                                ? 'bg-blue-500/20 text-blue-100'
-                                : 'bg-zinc-800/50'
+                                ? 'bg-blue500/20 text-blue100'
+                                : 'bg-zinc800/50'
                             }`}>
                               {message.content}
                             </p>
@@ -292,20 +292,20 @@ const ChatIcon: React.FC = () => {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    <form onSubmit={handleSendMessage} className="p-4 bg-zinc-800/30 border-t border-zinc-700/50">
-                      <div className="flex gap-x-2">
+                    <form onSubmit={handleSendMessage} className="p4 bg-zinc800/30 border-t border-zinc700/50">
+                      <div className="flex gap-x2">
                         <input
                           type="text"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          className="flex-grow bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
+                          className="flex-grow bg-zinc800 text-white px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                           placeholder="Type your message..."
                         />
                         <button
                           type="submit"
                           disabled={!newMessage.trim()}
-                          className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 ${
-                            !newMessage.trim() ? 'opacity-50 cursor-notallowed' : ''
+                          className={`bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors flex items-center gap2 ${
+                            !newMessage.trim() ? 'opacity50 cursor-notallowed' : ''
                           }`}
                         >
                           <Send size={18} />
