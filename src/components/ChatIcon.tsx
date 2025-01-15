@@ -325,7 +325,7 @@ const ChatIcon: React.FC = () => {
               <div className="flex-grow flex flex-col">
                 {activeRoom ? (
                   <>
-                    <div className="flex-grow overflow-y-auto p-4 space-y-4" ref={messagesContainerRef}>
+                    <div className="flex-grow overflow-y-auto opacity-90 blur p-4 space-y-4" ref={messagesContainerRef}>
                       {messages.map((message) => (
                         <div
                           key={message.id}
