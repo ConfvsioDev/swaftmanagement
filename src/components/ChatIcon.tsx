@@ -63,7 +63,7 @@ const ChatIcon: React.FC = () => {
 
         setUser({
           ...user,
-          nickname: profile?.nickname || 'Anonymous',
+          nickname: profile?.nickname || 'Anonyme',
           avatar_url: profile?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
         });
       }
@@ -132,7 +132,7 @@ const ChatIcon: React.FC = () => {
       const formattedMessages: Message[] = data.map((message) => ({
         ...message,
         user: {
-          nickname: message.profiles?.nickname || 'Anonymous',
+          nickname: message.profiles?.nickname || 'Anonyme',
           avatar_url: message.profiles?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
         },
       }));
@@ -164,7 +164,7 @@ const ChatIcon: React.FC = () => {
       if (error) throw error;
       setNewMessage('');
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Erreur d\'envoi du message:', error);
     }
   };
 
@@ -175,7 +175,7 @@ const ChatIcon: React.FC = () => {
       <button
         onClick={() => setIsModalOpen(true)}
         className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center transform hover:scale-105"
-        aria-label="Open chat"
+        aria-label="Ouvrir le chat"
       >
         <MessageSquare className="w-6 h-6" />
       </button>
@@ -186,7 +186,7 @@ const ChatIcon: React.FC = () => {
             <div className="flex justify-between items-center p-4 bg-gradient-to-r from-zinc-800/50 to-zinc-900/50 border-b border-zinc-700">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-6 w-6 text-blue-500" />
-                <h2 className="text-xl font-bold text-zinc-100">Chat</h2>
+                <h2 className="text-xl font-bold text-zinc-100">Discussion</h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -205,7 +205,7 @@ const ChatIcon: React.FC = () => {
                 }`}
                 onClick={() => setActiveTab('public')}
               >
-                Public Rooms
+                Salons Publics
               </button>
               <button
                 className={`flex-1 py-3 px-6 text-sm font-medium transition-colors ${
@@ -215,7 +215,7 @@ const ChatIcon: React.FC = () => {
                 }`}
                 onClick={() => setActiveTab('private')}
               >
-                Private Messages
+                Messages Privés
               </button>
             </div>
 
@@ -223,7 +223,7 @@ const ChatIcon: React.FC = () => {
               <div className="w-64 bg-zinc-800/30 border-r border-zinc-700/50 flex flex-col">
                 <div className="p-4">
                   <h3 className="text-sm font-semibold text-zinc-400 mb-3">
-                    {activeTab === 'public' ? 'Public Rooms' : 'Private Chats'}
+                    {activeTab === 'public' ? 'Salons Publics' : 'Discussions Privées'}
                   </h3>
                   <div className="space-y-1">
                     {rooms.map((room) => (
@@ -306,7 +306,7 @@ const ChatIcon: React.FC = () => {
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           className="flex-grow bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
-                          placeholder="Type your message..."
+                          placeholder="Écrivez votre message..."
                         />
                         <button
                           type="submit"
@@ -322,7 +322,7 @@ const ChatIcon: React.FC = () => {
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc-500">Select a room to start chatting</p>
+                    <p className="text-zinc-500">Sélectionnez un salon pour commencer à discuter</p>
                   </div>
                 )}
               </div>
