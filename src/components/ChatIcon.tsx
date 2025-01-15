@@ -22,6 +22,22 @@ type Room = {
   type: 'public' | 'private';
 };
 
+type Profile = {
+  nickname: string;
+  avatar_url: string;
+};
+
+type MessageWithProfile = {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  profiles: {
+    nickname: string;
+    avatar_url: string;
+  } | null;
+};
+
 const ChatIcon: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -69,7 +85,26 @@ const ChatIcon: React.FC = () => {
           table: 'messages', 
           filter: `room_id=eq.${activeRoom}` 
         }, payload => {
-          setMessages(current => [...current, payload.new as Message]);
+          const newMessage = payload.new as any;
+          // Format the message with user data
+          supabase
+            .from('profiles')
+            .select('nickname, avatar_url')
+            .eq('id', newMessage.user_id)
+            .single()
+            .then(({ data: profile }) => {
+              if (profile) {
+                setMessages(current => [...current, {
+                  id: newMessage.id,
+                  content: newMessage.content,
+                  created_at: newMessage.created_at,
+                  user: {
+                    nickname: profile.nickname || 'Anonymous',
+                    avatar_url: profile.avatar_url || '/default-avatar.png'
+                  }
+                }]);
+              }
+            });
         })
         .subscribe();
 
@@ -97,22 +132,27 @@ const ChatIcon: React.FC = () => {
         id,
         content,
         created_at,
-        user:profiles(nickname, avatar_url)
+        user_id,
+        profiles!messages_user_id_fkey (
+          nickname,
+          avatar_url
+        )
       `)
       .eq('room_id', roomId)
-      .order('created_at', { ascending: true })
-      .limit(50);
+      .order('created_at', { ascending: true });
 
     if (data) {
-      setMessages(data.map(message => ({
+      const rawMessages = data as unknown as MessageWithProfile[];
+      const formattedMessages: Message[] = rawMessages.map(message => ({
         id: message.id,
         content: message.content,
         created_at: message.created_at,
-        user: message.user[0] || {
-          nickname: 'Anonymous',
-          avatar_url: '/default-avatar.png'
+        user: {
+          nickname: message.profiles?.nickname || 'Anonymous',
+          avatar_url: message.profiles?.avatar_url || '/default-avatar.png'
         }
-      })));
+      }));
+      setMessages(formattedMessages);
     }
   };
 
@@ -121,18 +161,20 @@ const ChatIcon: React.FC = () => {
     
     if (newMessage.trim() === '' || !activeRoom || !user) return;
 
-    const { error } = await supabase
-      .from('messages')
-      .insert({
-        room_id: activeRoom,
-        user_id: user.id,
-        content: newMessage.trim()
-      });
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          room_id: activeRoom,
+          user_id: user.id,
+          content: newMessage.trim()
+        });
 
-    if (error) {
-      console.error("Error sending message:", error.message);
-    } else {
+      if (error) throw error;
+      
       setNewMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
   };
 
