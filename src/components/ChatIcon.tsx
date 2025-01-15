@@ -396,16 +396,21 @@ const ChatIcon: React.FC = () => {
                               ) : (
                                 <>
                                   <div
-                                    className={`rounded-lg py-2 px-4 ${
-                                      message.user_id === user.id
-                                        ? 'bg-blue-600 text-white rounded-tr-none'
-                                        : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
-                                    }`}
-                                  >
-                                    <p className="text-sm leading-relaxed break-words">
-                                      {message.content}
-                                    </p>
-                                  </div>
+                                className={`rounded-lg py-2 px-4 ${
+                                  message.user_id === user.id
+                                    ? 'bg-blue-600 text-white rounded-tr-none'
+                                    : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
+                                } max-w-[400px]`}
+                              >
+                                <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                                  {message.content.split('\n').map((line, i) => (
+                                    <React.Fragment key={i}>
+                                      {line}
+                                      {i !== message.content.split('\n').length - 1 && <br />}
+                                    </React.Fragment>
+                                  ))}
+                                </p>
+                              </div>
                                   {message.user_id === user.id && (
                                     <div className={`absolute top-0 ${message.user_id === user.id ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'} flex gap-2 px-2 opacity-0 group-hover:opacity-100 transition-opacity`}>
                                       <button
