@@ -50,6 +50,7 @@ const ChatIcon: React.FC = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -60,6 +61,8 @@ const ChatIcon: React.FC = () => {
           .select('nickname, avatar_url')
           .eq('id', user.id)
           .single();
+
+        console.log('Fetched profile:', profile); // Debugging log
 
         setUser({
           ...user,
@@ -73,6 +76,7 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
+  // Fetch rooms
   useEffect(() => {
     const fetchRooms = async () => {
       const { data: roomsData } = await supabase
@@ -92,6 +96,7 @@ const ChatIcon: React.FC = () => {
     fetchRooms();
   }, [activeTab, activeRoom, supabase]);
 
+  // Subscribe to new messages in the active room
   useEffect(() => {
     if (!activeRoom) return;
 
@@ -112,33 +117,36 @@ const ChatIcon: React.FC = () => {
     };
   }, [activeRoom, supabase]);
 
+  // Fetch messages for the active room
   const fetchMessages = useCallback(async () => {
     if (!activeRoom) return;
-  
+
     const { data, error } = await supabase
-  .from('messages')
-  .select(`
-    *,
-    profiles:user_id (
-      nickname,
-      avatar_url
-    )
-  `)
-  .eq('room_id', activeRoom.id)
-  .eq('private', activeTab === 'private')
-  .order('created_at', { ascending: true });
-  
+      .from('messages')
+      .select(`
+        *,
+        profiles:user_id (
+          nickname,
+          avatar_url
+        )
+      `)
+      .eq('room_id', activeRoom.id)
+      .eq('private', activeTab === 'private')
+      .order('created_at', { ascending: true });
+
+    console.log('Fetched messages:', data); // Debugging log
+
     if (error) {
       console.error('Error fetching messages:', error);
       return;
     }
-  
+
     if (data) {
       const formattedMessages: Message[] = data.map((message) => ({
         ...message,
         user: {
-          nickname: message.user?.nickname || 'Anonyme',
-          avatar_url: message.user?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
+          nickname: message.profiles?.nickname || 'Anonyme',
+          avatar_url: message.profiles?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
         },
       }));
       setMessages(formattedMessages);
@@ -146,12 +154,14 @@ const ChatIcon: React.FC = () => {
     }
   }, [activeRoom, activeTab, supabase, scrollToBottom]);
 
+  // Fetch messages when the active room changes
   useEffect(() => {
     if (activeRoom) {
       fetchMessages();
     }
   }, [activeRoom, fetchMessages]);
 
+  // Handle sending a new message
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (newMessage.trim() === '' || !user || !activeRoom) return;
@@ -169,7 +179,7 @@ const ChatIcon: React.FC = () => {
       if (error) throw error;
       setNewMessage('');
     } catch (error) {
-      console.error('Erreur d\'envoi du message:', error);
+      console.error('Error sending message:', error);
     }
   };
 
@@ -238,13 +248,13 @@ const ChatIcon: React.FC = () => {
                         className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                           activeRoom?.id === room.id
                             ? 'bg-blue-500/20 text-blue-400'
-                            : 'text-zinc-300 hover:bg-zinc-700/50'
+                            : 'text-zinc-300 hover:bg-zinc700/50'
                         }`}
                       >
                         {activeTab === 'public' ? (
-                          <Hash className="w-4 h-4 text-zinc-500" />
+                          <Hash className="w-4 h-4 text-zinc500" />
                         ) : (
-                          <Lock className="w-4 h-4 text-zinc-500" />
+                          <Lock className="w-4 h=4 text-zinc500" />
                         )}
                         <span className="truncate">{room.name}</span>
                       </button>
@@ -256,15 +266,15 @@ const ChatIcon: React.FC = () => {
               <div className="flex-grow flex flex-col">
                 {activeRoom ? (
                   <>
-                    <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                    <div className="flex-grow overflow-y-auto p4 space-y4">
                       {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex items-start gap-3 ${
+                          className={`flex items-start gap3 ${
                             message.user_id === user.id ? 'flex-row-reverse' : ''
                           }`}
                         >
-                          <div className="flex-shrink-0">
+                          <div className="flex-shrink0">
                             <Image
                               src={message.user.avatar_url}
                               alt={message.user.nickname}
@@ -278,19 +288,19 @@ const ChatIcon: React.FC = () => {
                               message.user_id === user.id ? 'items-end' : ''
                             }`}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-zinc-100">
+                            <div className="flex items-center gap2">
+                              <span className="font-medium text-zinc100">
                                 {message.user.nickname}
                               </span>
-                              <span className="text-xs text-zinc-500">
+                              <span className="text-xs text-zinc500">
                                 {new Date(message.created_at).toLocaleTimeString()}
                               </span>
                             </div>
                             <p
-                              className={`text-zinc-300 rounded-lg py-2 px-3 mt-1 max-w-md ${
+                              className={`text-zinc300 rounded-lg py2 px3 mt1 max-w-md ${
                                 message.user_id === user.id
-                                  ? 'bg-blue-500/20 text-blue-100'
-                                  : 'bg-zinc-800/50'
+                                  ? 'bg-blue500/20 text-blue100'
+                                  : 'bg-zinc800/50'
                               }`}
                             >
                               {message.content}
@@ -303,31 +313,31 @@ const ChatIcon: React.FC = () => {
 
                     <form
                       onSubmit={handleSendMessage}
-                      className="p-4 bg-zinc-800/30 border-t border-zinc-700/50"
+                      className="p4 bg-zinc800/30 border-t border-zinc700/50"
                     >
-                      <div className="flex gap-x-2">
+                      <div className="flex gap-x2">
                         <input
                           type="text"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          className="flex-grow bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
+                          className="flex-grow bg-zinc800 text-white px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                           placeholder="Écrivez votre message..."
                         />
                         <button
                           type="submit"
                           disabled={!newMessage.trim()}
-                          className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center gap-2 ${
-                            !newMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''
+                          className={`bg-gradient-to-r from-blue600 to-blue700 text-white px4 py2 rounded-lg hover:from-blue700 hover:to-blue800 transition-colors flex items-center gap2 ${
+                            !newMessage.trim() ? 'opacity50 cursor-notallowed' : ''
                           }`}
                         >
-                          <Send className="w-4 h-4" />
+                          <Send className="w4 h4" />
                         </button>
                       </div>
                     </form>
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc-500">Sélectionnez un salon pour commencer à discuter</p>
+                    <p className="text-zinc500">Sélectionnez un salon pour commencer à discuter</p>
                   </div>
                 )}
               </div>
