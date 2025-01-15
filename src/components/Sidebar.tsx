@@ -15,7 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image'; // Import Image
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 const sidebarItems = [
@@ -36,12 +36,14 @@ const Sidebar = () => {
       avatar_url?: string;
     };
   } | null>(null);
+  const [loading, setLoading] = useState(true);
   
   const pathname = usePathname();
   const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
@@ -59,10 +61,15 @@ const Sidebar = () => {
           },
         });
       }
+      setLoading(false);
     };
 
     fetchUserData();
   }, [supabase]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a more sophisticated loading indicator
+  }
 
   return (
     <aside className={cn(

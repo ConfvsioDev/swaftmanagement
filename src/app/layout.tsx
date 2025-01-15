@@ -1,21 +1,33 @@
-// layout.tsx
+'use client';
+
 import './globals.css';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
+import { Session } from '@supabase/supabase-js';
 
-export const metadata = {
-  title: "Gestion Swaft",
-  description: "Outils de Gestion de Swaft",
-};
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createServerComponentClient({ cookies });
-  const { data: { session } } = await supabase.auth.getSession();
+  const [session, setSession] = useState<Session | null>(null);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   return (
     <html lang="fr" suppressHydrationWarning>
