@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageSquare, X, Send, ChevronDown } from 'lucide-react';
+import { MessageSquare, X, Send } from 'lucide-react'; // Removed ChevronDown
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -27,7 +27,7 @@ const ChatIcon: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'private' | 'public'>('public');
-  const [activeRoom, setActiveRoom] = useState<string | null>(null);
+  const [activeRoom, setActiveRoom] = useState<string | null>(null); // Ensure this is used appropriately
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ const ChatIcon: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -233,8 +233,8 @@ const ChatIcon: React.FC = () => {
                           className="rounded-full"
                         />
                         <div className="flex flex-col">
-                          <span className="font-medium text-zinc-100">{message.user.nickname}</span>
-                          <span className="text-xs text-zinc-500">{new Date(message.created_at).toLocaleTimeString()}</span>
+                          <span className="font-medium text-zinc100">{message.user.nickname}</span>
+                          <span className="text-xs text-zinc500">{new Date(message.created_at).toLocaleTimeString()}</span>
                           <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word mt1">{message.content}</p>
                         </div>
                       </div>
@@ -244,7 +244,7 @@ const ChatIcon: React.FC = () => {
               )}
             </div>
 
-            <form onSubmit={handleSendMessage} className="p-4 bg-zinc800/30 border-t border-zinc700/50">
+            <form onSubmit={handleSendMessage} className="p4 bg-zinc800/30 border-t border-zinc700/50">
               <div className="flex gap-x-2">
                 <input
                   type="text"
@@ -256,7 +256,7 @@ const ChatIcon: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className={`bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors ${!newMessage.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors ${!newMessage.trim() ? "opacity-50 cursor-notallowed" : ""}`}
                 >
                   <Send size={18} />
                 </button>
