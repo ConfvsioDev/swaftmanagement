@@ -111,9 +111,9 @@ const ChatIcon: React.FC = () => {
       .select();
 
     if (error) {
-      console.error("Error sending message:", error);
+      console.error("Error sending message:", error.message); // Log error message for debugging
     } else {
-      setMessages(prev => [...prev, { ...data[0], user: { nickname: user.user_metadata.nickname, avatar_url: user.user_metadata.avatar_url } }]);
+      setMessages(prev => [...prev, { ...data[0], user: { nickname: user.user_metadata.nickname || 'Anonymous', avatar_url: user.user_metadata.avatar_url || '/default-avatar.png' } }]);
       setNewMessage('');
     }
   };
