@@ -22,15 +22,17 @@ type Room = {
   type: 'public' | 'private';
 };
 
+type Profile = {
+  nickname: string;
+  avatar_url: string;
+};
+
 type MessageWithProfile = {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
-  profiles: {
-    nickname: string;
-    avatar_url: string;
-  } | null;
+  profiles: Profile[] | null; // Adjusted to be an array
 };
 
 const ChatIcon: React.FC = () => {
@@ -43,7 +45,7 @@ const ChatIcon: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const supabase = createClientComponentClient();
 
   const scrollToBottom = () => {
@@ -105,7 +107,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom, supabase]); // Ensure all dependencies are included
+  }, [activeRoom, supabase]);
 
   const fetchRooms = async () => {
     const { data } = await supabase
@@ -154,8 +156,7 @@ const ChatIcon: React.FC = () => {
     }
 };
 
-
-  const handleSendMessage = async (e?: React.FormEvent) => {
+const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
     if (newMessage.trim() === '' || !activeRoom || !user) return;
@@ -175,11 +176,11 @@ const ChatIcon: React.FC = () => {
     } catch (error) {
       console.error('Error sending message:', error);
     }
-  };
+};
 
-  if (loading || !user) return null;
+if (loading || !user) return null;
 
-  return (
+return (
     <>
       <button
         onClick={() => setIsModalOpen(true)}
@@ -277,12 +278,12 @@ const ChatIcon: React.FC = () => {
                                 <span className="font-medium text-zinc-100">
                                   {message.user.nickname}
                                 </span>
-                                <span className="text-xs text-zinc-500">
+                                <span className="text-xs text-zinc500">
                                   {new Date(message.created_at).toLocaleTimeString()}
                                 </span>
                               </div>
                             )}
-                            <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-word">
+                            <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word">
                               {message.content}
                             </p>
                           </div>
@@ -296,13 +297,13 @@ const ChatIcon: React.FC = () => {
             </div>
 
             {/* Message Input */}
-            <form onSubmit={handleSendMessage} className="p-4 bg-zinc-800/30 border-t border-zinc-700/50">
-              <div className="flex gap-2">
+            <form onSubmit={handleSendMessage} className="p4 bg-zinc800/30 border-t border-zinc700/50">
+              <div className="flex gap2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                  className="flex1 bg-zinc800 text-zinc100 px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                   placeholder="Écrivez votre message..."
                 />
                 <button
