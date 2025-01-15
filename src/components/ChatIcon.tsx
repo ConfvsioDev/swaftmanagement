@@ -30,7 +30,9 @@ const ChatIcon: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  
+  // Replace this with your actual room ID
+  const roomId = 'default-room-id'; // Placeholder for room ID
   const supabase = createClientComponentClient();
 
   const scrollToBottom = useCallback(() => {
@@ -66,57 +68,51 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
-  const fetchMessages = useCallback(
-    async (roomId: string) => {
-      const { data } = await supabase
-        .from('messages')
-        .select(`
-          id,
-          content,
-          created_at,
-          user_id,
-          profiles!messages_user_id_fkey (
-            nickname,
-            avatar_url
-          )
-        `)
-        .eq('room_id', roomId)
-        .order('created_at', { ascending: true });
+  const fetchMessages = useCallback(async () => {
+    const { data } = await supabase
+      .from('messages')
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        profiles!messages_user_id_fkey (
+          nickname,
+          avatar_url
+        )
+      `)
+      .eq('room_id', roomId)
+      .order('created_at', { ascending: true });
 
-      if (data) {
-        const formattedMessages: Message[] = data.map((message) => ({
-          id: message.id,
-          content: message.content,
-          created_at: message.created_at,
-          user_id: message.user_id,
-          user: {
-            nickname: message.profiles[0]?.nickname || 'Anonymous',
-            avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
-          },
-        }));
-        setMessages(formattedMessages);
-      }
-    },
-    [supabase]
-  );
-
-  // Fetch messages when the active tab changes
-  useEffect(() => {
-    if (activeTab === 'public') {
-      fetchMessages('default-room-id'); // Replace with actual room ID logic
+    if (data) {
+      const formattedMessages: Message[] = data.map((message) => ({
+        id: message.id,
+        content: message.content,
+        created_at: message.created_at,
+        user_id: message.user_id,
+        user: {
+          nickname: message.profiles[0]?.nickname || 'Anonymous',
+          avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
+        },
+      }));
+      setMessages(formattedMessages);
     }
-  }, [activeTab, fetchMessages]);
+  }, [supabase]);
+
+  // Fetch messages when the component mounts or when the room changes
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (newMessage.trim() === '' || !user) return;
 
     try {
-      // Replace 'default-room-id' with actual room ID when implemented
       const { error } = await supabase
         .from('messages')
         .insert({
-          room_id: 'default-room-id', // Placeholder for room ID
+          room_id: roomId, // Use the actual room ID here
           user_id: user.id,
           content: newMessage.trim(),
         });
@@ -124,6 +120,7 @@ const ChatIcon: React.FC = () => {
       if (error) throw error;
 
       setNewMessage('');
+      fetchMessages(); // Fetch updated messages after sending a new one
     } catch (error) {
       console.error('Error sending message:', error);
     }
