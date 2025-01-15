@@ -90,15 +90,15 @@ export default function Dashboard() {
   ];
 
   const teamMembers = [
-    { id: 1, name: 'Sophie Martin', role: 'Designer UI/UX', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-    { id: 2, name: 'Thomas Dubois', role: 'Développeur', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
-    { id: 3, name: 'Emma Laurent', role: 'Chef de Projet', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
+    { id: 1, name: 'Clarel', role: 'Développeur', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
+    { id: 2, name: 'Ylian', role: 'Sert a rien', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
+    { id: 3, name: 'Nathan', role: 'Designer UI/UX', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
   ];
 
   const recentActivities: Activity[] = [
-    { id: 1, title: 'Réunion équipe design', time: '14:00', type: 'meeting' },
-    { id: 2, title: 'Mise à jour dashboard v2', time: '11:30', type: 'update' },
-    { id: 3, title: 'Review code frontend', time: '09:15', type: 'task' },
+    { id: 1, title: 'Réunion équipe', time: '14:00', type: 'meeting' },
+    { id: 2, title: 'Mise à jour', time: '11:30', type: 'update' },
+    { id: 3, title: 'Review code', time: '09:15', type: 'task' },
   ];
 
   return (
