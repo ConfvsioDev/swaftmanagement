@@ -30,9 +30,9 @@ const ChatIcon: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Replace this with your actual room ID
-  const roomId = 'default-room-id'; // Placeholder for room ID
+
+  // Replace this with your actual room ID logic
+  const roomId = 'your-valid-uuid-here'; // Placeholder for a valid UUID of the room
   const supabase = createClientComponentClient();
 
   const scrollToBottom = useCallback(() => {
@@ -81,7 +81,7 @@ const ChatIcon: React.FC = () => {
           avatar_url
         )
       `)
-      .eq('room_id', roomId)
+      .eq('room_id', roomId) // Use the actual room ID here
       .order('created_at', { ascending: true });
 
     if (data) {
@@ -97,7 +97,7 @@ const ChatIcon: React.FC = () => {
       }));
       setMessages(formattedMessages);
     }
-  }, [supabase]);
+  }, [supabase, roomId]);
 
   // Fetch messages when the component mounts or when the room changes
   useEffect(() => {
