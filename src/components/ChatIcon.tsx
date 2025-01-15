@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, X } from 'lucide-react'; // Removed unused imports
+import { MessageSquare, X } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -62,7 +62,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom, supabase]); // Ensure that fetchMessages is included if defined
+  }, [activeRoom, supabase]);
 
   const fetchRooms = async () => {
     const { data } = await supabase
@@ -92,7 +92,7 @@ const ChatIcon: React.FC = () => {
         id: message.id,
         content: message.content,
         created_at: message.created_at,
-        user: message.user[0], // Accessing the first user object directly
+        user: message.user[0],
       }));
       setMessages(formattedMessages.reverse());
     }
@@ -121,42 +121,42 @@ const ChatIcon: React.FC = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-4 right-4 bg-gradient-to-br from-blue-600 to-blue-800 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300"
+        className="fixed bottom-4 right-4 bg-zinc-800 text-white p-3 rounded-full shadow-lg hover:bg-zinc-700 transition-all duration-300"
         aria-label="Open chat"
       >
         <MessageSquare size={24} />
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white w-full md:w-3/4 lg:w-2/3 xl:w-1/2 h-3/4 rounded-xl shadow-lg overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center p-4 bg-blue-600 text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+          <div className="bg-zinc-900 w-full md:w-3/4 lg:w-2/3 xl:w-1/2 h-3/4 rounded-xl shadow-lg overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center p-4 bg-zinc-800 text-white">
               <h2 className="text-xl font-bold">Chat</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-white hover:text-gray-200 transition-colors">
                 <X size={24} />
               </button>
             </div>
-            <div className="flex border-b border-gray-300">
+            <div className="flex border-b border-gray-600">
               <button
-                className={`flex-grow py-2 text-center ${activeTab === 'private' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                className={`flex-grow py-2 text-center ${activeTab === 'private' ? 'bg-zinc-700 text-white' : 'text-gray-400'}`}
                 onClick={() => setActiveTab('private')}
               >
                 Messages Privés
               </button>
               <button
-                className={`flex-grow py-2 text-center ${activeTab === 'public' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                className={`flex-grow py-2 text-center ${activeTab === 'public' ? 'bg-zinc-700 text-white' : 'text-gray-400'}`}
                 onClick={() => setActiveTab('public')}
               >
                 Public Rooms
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+            <div className="flex-1 overflow-y-auto p-4 bg-zinc-800">
               {activeTab === 'public' && (
                 <>
                   <select 
                     value={activeRoom || ''}
                     onChange={(e) => setActiveRoom(e.target.value)}
-                    className="mb-4 bg-gray-200 text-black p-2 rounded-lg w-full"
+                    className="mb-4 bg-zinc-700 text-white p-2 rounded-lg w-full"
                   >
                     {rooms.map(room => (
                       <option key={room.id} value={room.id}>{room.name}</option>
@@ -164,34 +164,34 @@ const ChatIcon: React.FC = () => {
                   </select>
                   <div className="space-y-4">
                     {messages.map(message => (
-                      <div key={message.id} className="bg-white border rounded-lg p-3 shadow-sm">
+                      <div key={message.id} className="bg-zinc-700 border rounded-lg p-3 shadow-sm">
                         <div className="flex items-center mb-1">
                           <Image src={message.user.avatar_url || '/default-avatar.png'} alt={message.user.nickname} width={32} height={32} className="rounded-full mr-2" />
-                          <span className="font-semibold">{message.user.nickname}</span>
-                          <span className="text-xs text-gray-500 ml-auto">{new Date(message.created_at).toLocaleTimeString()}</span>
+                          <span className="font-semibold text-white">{message.user.nickname}</span>
+                          <span className="text-xs text-gray-300 ml-auto">{new Date(message.created_at).toLocaleTimeString()}</span>
                         </div>
-                        <p>{message.content}</p>
+                        <p className="text-gray-200">{message.content}</p>
                       </div>
                     ))}
                   </div>
                 </>
               )}
             </div>
-            <div className="p-4 bg-gray-200">
+            <div className="p-4 bg-zinc-800">
               <div className="flex">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  className="flex-grow bg-white text-black p-2 rounded-l-lg focus:outline-none focus:ring focus:ring-blue-500"
-                  placeholder="Type a message..."
+                  className="flex-grow bg-zinc-700 text-white p-2 rounded-l-lg focus:outline-none focus:ring focus:ring-blue-500"
+                  placeholder="Tapez un message..."
                 />
                 <button
                   onClick={handleSendMessage}
                   className="bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700 transition-colors"
                 >
-                  Send
+                  Envoyer
                 </button>
               </div>
             </div>
