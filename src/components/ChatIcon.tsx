@@ -22,19 +22,6 @@ type Room = {
   type: 'public' | 'private';
 };
 
-type Profile = {
-  nickname: string;
-  avatar_url: string;
-};
-
-type MessageWithProfile = {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: Profile[] | null; // Adjusted to be an array
-};
-
 const ChatIcon: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -81,7 +68,7 @@ const ChatIcon: React.FC = () => {
           table: 'messages', 
           filter: `room_id=eq.${activeRoom}` 
         }, async (payload) => {
-          const newMessageData = payload.new as MessageWithProfile; // Use specific type
+          const newMessageData = payload.new as any; // Use specific type
           // Format the message with user data
           const { data: profile } = await supabase
             .from('profiles')
@@ -137,26 +124,20 @@ const ChatIcon: React.FC = () => {
       .order('created_at', { ascending: true });
 
     if (data) {
-      const formattedMessages: Message[] = data.map((message) => {
-        // Ensure profiles is treated as an array and check for null
-        const profiles = message.profiles || [];
-        const firstProfile = profiles.length > 0 ? profiles[0] : { nickname: 'Anonymous', avatar_url: '/default-avatar.png' };
-        
-        return {
-          id: message.id,
-          content: message.content,
-          created_at: message.created_at,
-          user: {
-            nickname: firstProfile.nickname,
-            avatar_url: firstProfile.avatar_url
-          }
-        };
-      });
+      const formattedMessages: Message[] = data.map((message) => ({
+        id: message.id,
+        content: message.content,
+        created_at: message.created_at,
+        user: {
+          nickname: message.profiles[0]?.nickname || 'Anonymous',
+          avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
+        },
+      }));
       setMessages(formattedMessages);
     }
-};
+  };
 
-const handleSendMessage = async (e?: React.FormEvent) => {
+  const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
     if (newMessage.trim() === '' || !activeRoom || !user) return;
@@ -256,40 +237,24 @@ return (
                     ref={messagesEndRef}
                     className="flex1 overflow-y-auto p4 space-y4"
                   >
-                    {messages.map((message, index) => {
-                      const isConsecutive = index > 0 && 
-                        messages[index - 1].user.nickname === message.user.nickname &&
-                        new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() < 300000;
-
-                      return (
-                        <div key={message.id} className={`flex items-start gap3 ${isConsecutive ? 'mt1' : 'mt4'}`}>
-                          {!isConsecutive && (
-                            <Image
-                              src={message.user.avatar_url || '/default-avatar.png'}
-                              alt={message.user.nickname}
-                              width={36}
-                              height={36}
-                              className="rounded-full"
-                            />
-                          )}
-                          <div className={`flex1 ${isConsecutive ? 'ml-[44px]' : ''}`}>
-                            {!isConsecutive && (
-                              <div className="flex items-baseline gap2 mb1">
-                                <span className="font-medium text-zinc100">
-                                  {message.user.nickname}
-                                </span>
-                                <span className="text-xs text-zinc500">
-                                  {new Date(message.created_at).toLocaleTimeString()}
-                                </span>
-                              </div>
-                            )}
-                            <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word">
-                              {message.content}
-                            </p>
+                    {messages.map((message) => (
+                      <div key={message.id} className="flex items-start gap3 mt4">
+                        <Image
+                          src={message.user.avatar_url}
+                          alt={message.user.nickname}
+                          width={36}
+                          height={36}
+                          className="rounded-full"
+                        />
+                        <div className="flex1">
+                          <div className="flex items-baseline gap2 mb1">
+                            <span className="font-medium text-zinc100">{message.user.nickname}</span>
+                            <span className="text-xs text-zinc500">{new Date(message.created_at).toLocaleTimeString()}</span>
                           </div>
+                          <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word">{message.content}</p>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                     <div ref={messagesEndRef} />
                   </div>
                 </>
