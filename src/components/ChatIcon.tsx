@@ -100,7 +100,13 @@ const ChatIcon: React.FC = () => {
     [supabase]
   );
 
-  // Placeholder for activeRoom logic; you can implement it later
+  // Fetch messages when the active tab changes
+  useEffect(() => {
+    if (activeTab === 'public') {
+      fetchMessages('default-room-id'); // Replace with actual room ID logic
+    }
+  }, [activeTab, fetchMessages]);
+
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (newMessage.trim() === '' || !user) return;
