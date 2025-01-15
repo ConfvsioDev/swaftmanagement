@@ -44,21 +44,40 @@ const ChatIcon: React.FC = () => {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editedContent, setEditedContent] = useState('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isModalMounted, setIsModalMounted] = useState(false);
   
   // Add this function to handle initial scroll
   useEffect(() => {
-    if (messagesContainerRef.current) {
+    if (isModalOpen) {
+      // Set a small delay to ensure the modal is mounted
+      const timer = setTimeout(() => {
+        setIsModalMounted(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsModalMounted(false);
+    }
+  }, [isModalOpen]);
+
+  // Handle initial scroll when modal is mounted
+  useEffect(() => {
+    if (isModalMounted && messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [isModalMounted, messages]);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+    if (messagesEndRef.current && isModalMounted) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isModalMounted]);
 
+  // Scroll on new messages
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    if (isModalMounted) {
+      scrollToBottom();
+    }
+  }, [messages, scrollToBottom, isModalMounted]);
 
   // Fetch user data
   useEffect(() => {
