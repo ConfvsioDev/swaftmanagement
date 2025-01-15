@@ -17,16 +17,6 @@ type Message = {
   };
 };
 
-// Removed unused Room type if not needed
-// Uncomment below if you need to use Room type in your code
-/*
-type Room = {
-  id: string;
-  name: string;
-  type: 'public' | 'private';
-};
-*/
-
 type UserProfile = SupabaseUser & {
   nickname?: string;
   avatar_url?: string;
@@ -50,7 +40,7 @@ const ChatIcon: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -229,37 +219,12 @@ const ChatIcon: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex flex-col flex-grow min-h-0">
               {activeTab === 'public' && (
                 <>
-                  <div className="p-4 border-b border-zinc-700/50">
-                    <div className="relative">
-                      <select
-                        value={activeRoom || ''}
-                        onChange={(e) => setActiveRoom(e.target.value)}
-                        className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
-                      >
-                        {/* Assuming rooms are fetched somewhere else in your code */}
-                        {/* Example placeholder for rooms */}
-                        {/* rooms.filter((room) => room.type === 'public').map((room) => (
-                          <option key={room.id} value={room.id}>
-                            {room.name}
-                          </option>
-                        )) */}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none h-5 w-5" />
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex-1 overflow-y-auto p-4 space-y-4"
-                    ref={messagesEndRef}
-                  >
+                  <div className="flex-grow overflow-y-auto p-4 space-y-4" ref={messagesEndRef}>
                     {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className="flex items-start gap-3 mt-4"
-                      >
+                      <div key={message.id} className="flex items-start gap-3 mt-4">
                         <Image
                           src={message.user.avatar_url}
                           alt={message.user.nickname}
@@ -267,18 +232,10 @@ const ChatIcon: React.FC = () => {
                           height={36}
                           className="rounded-full"
                         />
-                        <div className="flex-1">
-                          <div className="flex items-baseline gap-2 mb-1">
-                            <span className="font-medium text-zinc-100">
-                              {message.user.nickname}
-                            </span>
-                            <span className="text-xs text-zinc500">
-                              {new Date(message.created_at).toLocaleTimeString()}
-                            </span>
-                          </div>
-                          <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word">
-                            {message.content}
-                          </p>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-zinc-100">{message.user.nickname}</span>
+                          <span className="text-xs text-zinc-500">{new Date(message.created_at).toLocaleTimeString()}</span>
+                          <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word mt1">{message.content}</p>
                         </div>
                       </div>
                     ))}
@@ -287,25 +244,21 @@ const ChatIcon: React.FC = () => {
               )}
             </div>
 
-            <form
-              onSubmit={handleSendMessage}
-              className="p4 bg-zinc800/30 border-t border-zinc700/50"
-            >
-              <div className="flex gap2">
+            <form onSubmit={handleSendMessage} className="p-4 bg-zinc800/30 border-t border-zinc700/50">
+              <div className="flex gap-x-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex1 bg-zinc800 text-zinc100 px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                  className="flex-grow bg-zinc800 text-white px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                   placeholder="Écrivez votre message..."
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:bg-blue500 disabled:cursor-notallowed flex items-center gap2"
+                  className={`bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors ${!newMessage.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <Send size={18} />
-                  <span>Envoyer</span>
                 </button>
               </div>
             </form>
