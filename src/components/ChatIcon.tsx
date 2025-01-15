@@ -241,20 +241,20 @@ return (
                       <select 
                         value={activeRoom || ''}
                         onChange={(e) => setActiveRoom(e.target.value)}
-                        className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                       >
                         {rooms.filter(room => room.type === 'public').map(room => (
                           <option key={room.id} value={room.id}>{room.name}</option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none h-5 w-5" />
+                      <ChevronDown className="absolute right-3 top1/2 -translate-y1/2 text-zinc400 pointer-events-none h5 w5" />
                     </div>
                   </div>
 
                   {/* Messages */}
                   <div 
                     ref={messagesEndRef}
-                    className="flex-1 overflow-y-auto p-4 space-y-4"
+                    className="flex1 overflow-y-auto p4 space-y4"
                   >
                     {messages.map((message, index) => {
                       const isConsecutive = index > 0 && 
@@ -262,7 +262,7 @@ return (
                         new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() < 300000;
 
                       return (
-                        <div key={message.id} className={`flex items-start gap-3 ${isConsecutive ? 'mt-1' : 'mt-4'}`}>
+                        <div key={message.id} className={`flex items-start gap3 ${isConsecutive ? 'mt1' : 'mt4'}`}>
                           {!isConsecutive && (
                             <Image
                               src={message.user.avatar_url || '/default-avatar.png'}
@@ -272,10 +272,10 @@ return (
                               className="rounded-full"
                             />
                           )}
-                          <div className={`flex-1 ${isConsecutive ? 'ml-[44px]' : ''}`}>
+                          <div className={`flex1 ${isConsecutive ? 'ml-[44px]' : ''}`}>
                             {!isConsecutive && (
-                              <div className="flex items-baseline gap-2 mb-1">
-                                <span className="font-medium text-zinc-100">
+                              <div className="flex items-baseline gap2 mb1">
+                                <span className="font-medium text-zinc100">
                                   {message.user.nickname}
                                 </span>
                                 <span className="text-xs text-zinc500">
@@ -309,7 +309,7 @@ return (
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:opacity50 disabled:cursor-notallowed flex items-center gap2"
+                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:bg-blue500 disabled:cursor-notallowed flex items-center gap2"
                 >
                   <Send size={18} />
                   <span>Envoyer</span>
