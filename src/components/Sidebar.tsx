@@ -76,6 +76,9 @@ const Sidebar = () => {
         console.error('Error logging out:', error);
       }
     };
+  if (loading) {
+    return <div></div>; // Or a more sophisticated loading indicator
+  }
 
   return (
     <aside className={cn(
