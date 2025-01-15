@@ -101,16 +101,21 @@ const ChatIcon: React.FC = () => {
   const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !activeRoom || !user) return;
 
-    await supabase
+    const { data, error } = await supabase
       .from('messages')
       .insert({
         room_id: activeRoom,
         user_id: user.id,
         content: newMessage
-      });
+      })
+      .select();
 
-    setNewMessage('');
-    fetchMessages(activeRoom); // Fetch messages again to update the UI
+    if (error) {
+      console.error("Error sending message:", error);
+    } else {
+      setMessages(prev => [...prev, { ...data[0], user: { nickname: user.user_metadata.nickname, avatar_url: user.user_metadata.avatar_url } }]);
+      setNewMessage('');
+    }
   };
 
   if (loading || !user) {
