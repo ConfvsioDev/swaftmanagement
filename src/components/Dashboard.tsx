@@ -93,6 +93,7 @@ export default function Dashboard() {
     { id: 1, name: 'Clarel', role: 'Développeur', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
     { id: 2, name: 'Ylian', role: 'Sert a rien', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
     { id: 3, name: 'Nathan', role: 'Designer UI/UX', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
+    { id: 4, name: 'Theophile', role: 'Sert a rien v2', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
   ];
 
   const recentActivities: Activity[] = [
