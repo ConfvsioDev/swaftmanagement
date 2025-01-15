@@ -2,6 +2,7 @@
 
 import './globals.css';
 import ClientLayout from './ClientLayout';
+import ChatIcon from '../components/ChatIcon';
 
 export const metadata = {
   title: "Gestion Swaft",
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body className="bg-zinc-900 text-gray-200">
         <ClientLayout>{children}</ClientLayout>
+        <ChatIcon />
       </body>
     </html>
   );
