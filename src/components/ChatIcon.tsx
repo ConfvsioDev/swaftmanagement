@@ -1,5 +1,5 @@
 // src/components/ChatIcon.tsx
-
+'use client'
 import React, { useState } from 'react';
 import { FaComments } from 'react-icons/fa';
 
