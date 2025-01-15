@@ -31,8 +31,8 @@ const ChatIcon: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Replace this with your actual room ID logic
-  const roomId = 'your-valid-uuid-here'; // Placeholder for a valid UUID of the room
+  // Replace this with your actual logic to get a valid room ID
+  const roomId = 'your-actual-valid-uuid'; // Make sure this is a valid UUID from your rooms table
   const supabase = createClientComponentClient();
 
   const scrollToBottom = useCallback(() => {
