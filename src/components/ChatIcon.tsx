@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react'; // Removed ChevronDown
+import { MessageSquare, X, Send } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -27,7 +27,6 @@ const ChatIcon: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'private' | 'public'>('public');
-  const [activeRoom, setActiveRoom] = useState<string | null>(null); // Ensure this is used appropriately
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -40,7 +39,7 @@ const ChatIcon: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]); // Ensure scrollToBottom is included
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -101,61 +100,17 @@ const ChatIcon: React.FC = () => {
     [supabase]
   );
 
-  useEffect(() => {
-    if (activeRoom) {
-      fetchMessages(activeRoom);
-      const subscription = supabase
-        .channel(`room:${activeRoom}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `room_id=eq.${activeRoom}`,
-          },
-          async (payload) => {
-            const newMessageData = payload.new as Message;
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('nickname, avatar_url')
-              .eq('id', newMessageData.user_id)
-              .single();
-
-            if (profile) {
-              setMessages((current) => [
-                ...current,
-                {
-                  id: newMessageData.id,
-                  content: newMessageData.content,
-                  created_at: newMessageData.created_at,
-                  user_id: newMessageData.user_id,
-                  user: {
-                    nickname: profile.nickname || 'Anonymous',
-                    avatar_url: profile.avatar_url || '/default-avatar.png',
-                  },
-                },
-              ]);
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [activeRoom, fetchMessages, supabase]);
-
+  // Placeholder for activeRoom logic; you can implement it later
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (newMessage.trim() === '' || !activeRoom || !user) return;
+    if (newMessage.trim() === '' || !user) return;
 
     try {
+      // Replace 'default-room-id' with actual room ID when implemented
       const { error } = await supabase
         .from('messages')
         .insert({
-          room_id: activeRoom,
+          room_id: 'default-room-id', // Placeholder for room ID
           user_id: user.id,
           content: newMessage.trim(),
         });
@@ -211,7 +166,7 @@ const ChatIcon: React.FC = () => {
                 className={`flex-1 py-3 px-6 text-sm font-medium transition-colors ${
                   activeTab === 'private'
                     ? 'bg-zinc-800/50 text-blue-500 border-b-2 border-blue-500'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    : 'text-zinc-400 hover:text-zinc200'
                 }`}
                 onClick={() => setActiveTab('private')}
               >
