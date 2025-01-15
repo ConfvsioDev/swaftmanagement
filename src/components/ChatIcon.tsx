@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageSquare, X, Send, Hash, Lock } from 'lucide-react';
+import { MessageSquare, X, Send, Plus, Hash, Lock } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -46,35 +46,6 @@ const ChatIcon: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const fetchMessages = useCallback(async () => {
-    if (!activeRoom) return;
-
-    const { data } = await supabase
-      .from('messages')
-      .select(`
-        *,
-        profiles:user_id (
-          nickname,
-          avatar_url
-        )
-      `)
-      .eq('room_id', activeRoom.id)
-      .eq('private', activeTab === 'private')
-      .order('created_at', { ascending: true });
-
-    if (data) {
-      const formattedMessages: Message[] = data.map((message) => ({
-        ...message,
-        user: {
-          nickname: message.profiles?.nickname || 'Anonyme',
-          avatar_url: message.profiles?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
-        },
-      }));
-      setMessages(formattedMessages);
-      scrollToBottom();
-    }
-  }, [activeRoom, activeTab, supabase, scrollToBottom]);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
@@ -93,7 +64,7 @@ const ChatIcon: React.FC = () => {
 
         setUser({
           ...user,
-          nickname: profile?.nickname || 'Anonyme',
+          nickname: profile?.nickname || 'Anonymous',
           avatar_url: profile?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
         });
       }
@@ -120,7 +91,7 @@ const ChatIcon: React.FC = () => {
     };
 
     fetchRooms();
-  }, [activeTab, supabase, activeRoom]);
+  }, [activeTab, supabase]);
 
   // Real-time messages subscription
   useEffect(() => {
@@ -133,7 +104,7 @@ const ChatIcon: React.FC = () => {
         schema: 'public',
         table: 'messages',
         filter: `room_id=eq.${activeRoom.id}`,
-      }, () => {
+      }, (payload) => {
         fetchMessages();
       })
       .subscribe();
@@ -141,7 +112,36 @@ const ChatIcon: React.FC = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [activeRoom, supabase, fetchMessages]);
+  }, [activeRoom, supabase]);
+
+  const fetchMessages = useCallback(async () => {
+    if (!activeRoom) return;
+
+    const { data } = await supabase
+      .from('messages')
+      .select(`
+        *,
+        profiles:user_id (
+          nickname,
+          avatar_url
+        )
+      `)
+      .eq('room_id', activeRoom.id)
+      .eq('private', activeTab === 'private')
+      .order('created_at', { ascending: true });
+
+    if (data) {
+      const formattedMessages: Message[] = data.map((message) => ({
+        ...message,
+        user: {
+          nickname: message.profiles?.nickname || 'Anonymous',
+          avatar_url: message.profiles?.avatar_url || 'https://source.unsplash.com/random/100x100/?avatar',
+        },
+      }));
+      setMessages(formattedMessages);
+      scrollToBottom();
+    }
+  }, [activeRoom, activeTab, supabase, scrollToBottom]);
 
   useEffect(() => {
     if (activeRoom) {
@@ -177,7 +177,7 @@ const ChatIcon: React.FC = () => {
       <button
         onClick={() => setIsModalOpen(true)}
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center"
-        aria-label="Ouvrir le chat"
+        aria-label="Open chat"
       >
         <MessageSquare size={24} />
       </button>
@@ -188,7 +188,7 @@ const ChatIcon: React.FC = () => {
             <div className="flex justify-between items-center p-4 bg-zinc-800/50 border-b border-zinc-700">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-6 w-6 text-blue-500" />
-                <h2 className="text-xl font-bold text-zinc-100">Discussion</h2>
+                <h2 className="text-xl font-bold text-zinc-100">Chat</h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -207,7 +207,7 @@ const ChatIcon: React.FC = () => {
                 }`}
                 onClick={() => setActiveTab('public')}
               >
-                Salons Publics
+                Public Rooms
               </button>
               <button
                 className={`flex-1 py-3 px-6 text-sm font-medium transition-colors ${
@@ -217,7 +217,7 @@ const ChatIcon: React.FC = () => {
                 }`}
                 onClick={() => setActiveTab('private')}
               >
-                Messages Privés
+                Private Messages
               </button>
             </div>
 
@@ -226,7 +226,7 @@ const ChatIcon: React.FC = () => {
               <div className="w-64 bg-zinc-800/30 border-r border-zinc-700/50 flex flex-col">
                 <div className="p-4">
                   <h3 className="text-sm font-semibold text-zinc-400 mb-3">
-                    {activeTab === 'public' ? 'Salons Publics' : 'Discussions Privées'}
+                    {activeTab === 'public' ? 'Public Rooms' : 'Private Chats'}
                   </h3>
                   <div className="space-y-1">
                     {rooms.map((room) => (
@@ -299,7 +299,7 @@ const ChatIcon: React.FC = () => {
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           className="flex-grow bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
-                          placeholder="Écrivez votre message..."
+                          placeholder="Type your message..."
                         />
                         <button
                           type="submit"
@@ -315,7 +315,7 @@ const ChatIcon: React.FC = () => {
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc-500">Sélectionnez un salon pour commencer à discuter</p>
+                    <p className="text-zinc-500">Select a room to start chatting</p>
                   </div>
                 )}
               </div>
