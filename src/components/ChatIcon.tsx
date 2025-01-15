@@ -10,7 +10,7 @@ type Message = {
   id: string;
   content: string;
   created_at: string;
-  user_id: string; // Ensure user_id is included
+  user_id: string;
   user: {
     nickname: string;
     avatar_url: string;
@@ -23,7 +23,6 @@ type Room = {
   type: 'public' | 'private';
 };
 
-// Extend Supabase User type to include additional properties
 type UserProfile = SupabaseUser & {
   nickname?: string;
   avatar_url?: string;
@@ -50,27 +49,24 @@ const ChatIcon: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch user data and profile on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Fetch user profile data
         const { data: profile } = await supabase
           .from('profiles')
           .select('nickname, avatar_url')
           .eq('id', user.id)
           .single();
 
-        // Update user state with profile information
         setUser({
           ...user,
           nickname: profile?.nickname || 'Anonymous',
           avatar_url: profile?.avatar_url || '/default-avatar.png',
         });
       } else {
-        setUser(null); // Handle case where no user is logged in
+        setUser(null);
       }
       setLoading(false);
     };
@@ -78,7 +74,6 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
-  // Fetch rooms from the database
   const fetchRooms = async () => {
     const { data } = await supabase
       .from('rooms')
@@ -90,48 +85,52 @@ const ChatIcon: React.FC = () => {
     }
   };
 
-  // Fetch messages for the active room and subscribe to new messages
   useEffect(() => {
     if (activeRoom) {
       fetchMessages(activeRoom);
       const subscription = supabase
         .channel(`room:${activeRoom}`)
-        .on('postgres_changes', { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'messages', 
-          filter: `room_id=eq.${activeRoom}` 
-        }, async (payload) => {
-          const newMessageData = payload.new as Message; // Specify type here
-          // Format the message with user data
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('nickname, avatar_url')
-            .eq('id', newMessageData.user_id)
-            .single();
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `room_id=eq.${activeRoom}`,
+          },
+          async (payload) => {
+            const newMessageData = payload.new as Message;
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('nickname, avatar_url')
+              .eq('id', newMessageData.user_id)
+              .single();
 
-          if (profile) {
-            setMessages(current => [...current, {
-              id: newMessageData.id,
-              content: newMessageData.content,
-              created_at: newMessageData.created_at,
-              user_id: newMessageData.user_id,
-              user: {
-                nickname: profile.nickname || 'Anonymous',
-                avatar_url: profile.avatar_url || '/default-avatar.png'
-              }
-            }]);
+            if (profile) {
+              setMessages((current) => [
+                ...current,
+                {
+                  id: newMessageData.id,
+                  content: newMessageData.content,
+                  created_at: newMessageData.created_at,
+                  user_id: newMessageData.user_id,
+                  user: {
+                    nickname: profile.nickname || 'Anonymous',
+                    avatar_url: profile.avatar_url || '/default-avatar.png',
+                  },
+                },
+              ]);
+            }
           }
-        })
+        )
         .subscribe();
 
       return () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom]); // Add activeRoom to dependencies
+  }, [activeRoom]);
 
-  // Fetch messages for a specific room
   const fetchMessages = async (roomId: string) => {
     const { data } = await supabase
       .from('messages')
@@ -163,10 +162,8 @@ const ChatIcon: React.FC = () => {
     }
   };
 
-  // Handle sending a new message
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    
     if (newMessage.trim() === '' || !activeRoom || !user) return;
 
     try {
@@ -175,20 +172,20 @@ const ChatIcon: React.FC = () => {
         .insert({
           room_id: activeRoom,
           user_id: user.id,
-          content: newMessage.trim()
+          content: newMessage.trim(),
         });
 
       if (error) throw error;
-      
+
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
-};
+  };
 
-if (loading || !user) return null;
+  if (loading || !user) return null;
 
-return (
+  return (
     <>
       <button
         onClick={() => setIsModalOpen(true)}
@@ -201,13 +198,12 @@ return (
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-zinc-900 w-full max-w-4xl h-[80vh] rounded-2xl shadow-xl overflow-hidden flex flex-col border border-zinc-800">
-            {/* Header */}
             <div className="flex justify-between items-center p-4 bg-zinc-800/50 border-b border-zinc-700">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-6 w-6 text-blue-500" />
                 <h2 className="text-xl font-bold text-zinc-100">Chat</h2>
               </div>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 hover:bg-zinc-700/50 rounded-lg transition-colors"
               >
@@ -215,12 +211,11 @@ return (
               </button>
             </div>
 
-            {/* Tabs */}
             <div className="flex border-b border-zinc-700/50">
               <button
                 className={`flex-1 py-3 px-6 text-sm font-medium transition-colors ${
-                  activeTab === 'public' 
-                    ? 'bg-zinc-800/50 text-blue-500 border-b-2 border-blue-500' 
+                  activeTab === 'public'
+                    ? 'bg-zinc-800/50 text-blue-500 border-b-2 border-blue-500'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
                 onClick={() => setActiveTab('public')}
@@ -239,33 +234,37 @@ return (
               </button>
             </div>
 
-            {/* Main Content */}
             <div className="flex-1 flex flex-col min-h-0">
               {activeTab === 'public' && (
                 <>
-                  {/* Room Selector */}
                   <div className="p-4 border-b border-zinc-700/50">
                     <div className="relative">
-                      <select 
+                      <select
                         value={activeRoom || ''}
                         onChange={(e) => setActiveRoom(e.target.value)}
-                        className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                        className="w-full appearance-none bg-zinc-800 text-zinc-100 px-4 py-2 pr-10 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
                       >
-                        {rooms.filter(room => room.type === 'public').map(room => (
-                          <option key={room.id} value={room.id}>{room.name}</option>
-                        ))}
+                        {rooms
+                          .filter((room) => room.type === 'public')
+                          .map((room) => (
+                            <option key={room.id} value={room.id}>
+                              {room.name}
+                            </option>
+                          ))}
                       </select>
-                      <ChevronDown className="absolute right-3 top1/2 -translate-y1/2 text-zinc400 pointer-events-none h5 w5" />
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none h-5 w-5" />
                     </div>
                   </div>
 
-                  {/* Messages */}
-                  <div 
+                  <div
+                    className="flex-1 overflow-y-auto p-4 space-y-4"
                     ref={messagesEndRef}
-                    className="flex1 overflow-y-auto p4 space-y4"
                   >
                     {messages.map((message) => (
-                      <div key={message.id} className="flex items-start gap3 mt4">
+                      <div
+                        key={message.id}
+                        className="flex items-start gap-3 mt-4"
+                      >
                         <Image
                           src={message.user.avatar_url}
                           alt={message.user.nickname}
@@ -273,35 +272,42 @@ return (
                           height={36}
                           className="rounded-full"
                         />
-                        <div className="flex1">
-                          <div className="flex items-baseline gap2 mb1">
-                            <span className="font-medium text-zinc100">{message.user.nickname}</span>
-                            <span className="text-xs text-zinc500">{new Date(message.created_at).toLocaleTimeString()}</span>
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <span className="font-medium text-zinc-100">
+                              {message.user.nickname}
+                            </span>
+                            <span className="text-xs text-zinc-500">
+                              {new Date(message.created_at).toLocaleTimeString()}
+                            </span>
                           </div>
-                          <p className="text-zinc300 bg-zinc800/50 rounded-lg py2 px3 break-word">{message.content}</p>
+                          <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-words">
+                            {message.content}
+                          </p>
                         </div>
                       </div>
                     ))}
-                    <div ref={messagesEndRef} />
                   </div>
                 </>
               )}
             </div>
 
-            {/* Message Input */}
-            <form onSubmit={handleSendMessage} className="p4 bg-zinc800/30 border-t border-zinc700/50">
-              <div className="flex gap2">
+            <form
+              onSubmit={handleSendMessage}
+              className="p-4 bg-zinc-800/30 border-t border-zinc-700/50"
+            >
+              <div className="flex gap-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex1 bg-zinc800 text-zinc100 px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
                   placeholder="Écrivez votre message..."
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:bg-blue500 disabled:cursor-notallowed flex items-center gap2"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-500 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <Send size={18} />
                   <span>Envoyer</span>
