@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageSquare, X, Send, Plus, Hash, Lock } from 'lucide-react';
+import { MessageSquare, X, Send, Hash, Lock } from 'lucide-react'; // Removed Plus
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User as SupabaseUser } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -91,7 +91,7 @@ const ChatIcon: React.FC = () => {
     };
 
     fetchRooms();
-  }, [activeTab, supabase]);
+  }, [activeTab, activeRoom, supabase]); // Added activeRoom to dependencies
 
   // Real-time messages subscription
   useEffect(() => {
@@ -305,7 +305,7 @@ const ChatIcon: React.FC = () => {
                           type="submit"
                           disabled={!newMessage.trim()}
                           className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 ${
-                            !newMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''
+                            !newMessage.trim() ? 'opacity-50 cursor-notallowed' : ''
                           }`}
                         >
                           <Send size={18} />
@@ -315,7 +315,7 @@ const ChatIcon: React.FC = () => {
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc-500">Select a room to start chatting</p>
+                    <p className="text-zinc500">Select a room to start chatting</p>
                   </div>
                 )}
               </div>
