@@ -1,6 +1,5 @@
 // src/app/login/page.tsx
 import AuthComponent from '@/components/Auth'
-import Image from 'next/image'
 
 export default function LoginPage() {
   return (
