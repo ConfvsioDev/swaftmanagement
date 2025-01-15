@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, X, Send, Users, Globe } from 'lucide-react';
+import { MessageSquare, X } from 'lucide-react'; // Removed unused imports
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -62,7 +62,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom, supabase]);
+  }, [activeRoom, supabase]); // Ensure that fetchMessages is included if defined
 
   const fetchRooms = async () => {
     const { data } = await supabase
