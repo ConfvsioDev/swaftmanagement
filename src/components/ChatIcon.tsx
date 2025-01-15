@@ -10,6 +10,7 @@ type Message = {
   id: string;
   content: string;
   created_at: string;
+  user_id: string; // Added user_id property
   user: {
     nickname: string;
     avatar_url: string;
@@ -57,6 +58,17 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
+  const fetchRooms = async () => {
+    const { data } = await supabase
+      .from('rooms')
+      .select('id, name, type')
+      .order('name');
+    if (data) {
+      setRooms(data);
+      setActiveRoom(data[0]?.id || null);
+    }
+  };
+
   useEffect(() => {
     if (activeRoom) {
       fetchMessages(activeRoom);
@@ -68,7 +80,7 @@ const ChatIcon: React.FC = () => {
           table: 'messages', 
           filter: `room_id=eq.${activeRoom}` 
         }, async (payload) => {
-          const newMessageData = payload.new as any; // Use specific type
+          const newMessageData = payload.new as Message; // Specify type here
           // Format the message with user data
           const { data: profile } = await supabase
             .from('profiles')
@@ -81,6 +93,7 @@ const ChatIcon: React.FC = () => {
               id: newMessageData.id,
               content: newMessageData.content,
               created_at: newMessageData.created_at,
+              user_id: newMessageData.user_id, // Include user_id
               user: {
                 nickname: profile.nickname || 'Anonymous',
                 avatar_url: profile.avatar_url || '/default-avatar.png'
@@ -94,18 +107,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom, supabase]);
-
-  const fetchRooms = async () => {
-    const { data } = await supabase
-      .from('rooms')
-      .select('id, name, type')
-      .order('name');
-    if (data) {
-      setRooms(data);
-      setActiveRoom(data[0]?.id || null);
-    }
-  };
+  }, [activeRoom]); // Add activeRoom to dependencies
 
   const fetchMessages = async (roomId: string) => {
     const { data } = await supabase
@@ -128,6 +130,7 @@ const ChatIcon: React.FC = () => {
         id: message.id,
         content: message.content,
         created_at: message.created_at,
+        user_id: message.user_id, // Include user_id here
         user: {
           nickname: message.profiles[0]?.nickname || 'Anonymous',
           avatar_url: message.profiles[0]?.avatar_url || '/default-avatar.png',
