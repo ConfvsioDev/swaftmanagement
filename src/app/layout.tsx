@@ -1,5 +1,3 @@
-'use client';
-
 import './globals.css';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
