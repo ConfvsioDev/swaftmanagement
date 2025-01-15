@@ -50,7 +50,6 @@ const ChatIcon: React.FC = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -74,13 +73,13 @@ const ChatIcon: React.FC = () => {
     fetchUserData();
   }, [supabase]);
 
-  // Fetch rooms
   useEffect(() => {
     const fetchRooms = async () => {
       const { data: roomsData } = await supabase
         .from('rooms')
         .select('*')
-        .eq('type', activeTab === 'public' ? 'public' : 'private');
+        .eq('type', activeTab === 'public' ? 'public' : 'private')
+        .order('created_at', { ascending: true });
 
       if (roomsData) {
         setRooms(roomsData);
@@ -91,13 +90,12 @@ const ChatIcon: React.FC = () => {
     };
 
     fetchRooms();
-  }, [activeTab, activeRoom, supabase]); // Added activeRoom to dependencies
+  }, [activeTab, activeRoom, supabase]);
 
-  // Real-time messages subscription
   useEffect(() => {
     if (!activeRoom) return;
 
-    const subscription = supabase
+    const channel = supabase
       .channel(`room:${activeRoom.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
@@ -105,12 +103,12 @@ const ChatIcon: React.FC = () => {
         table: 'messages',
         filter: `room_id=eq.${activeRoom.id}`,
       }, () => {
-        fetchMessages(); // Removed payload variable
+        fetchMessages();
       })
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [activeRoom, supabase]);
 
@@ -147,7 +145,7 @@ const ChatIcon: React.FC = () => {
     if (activeRoom) {
       fetchMessages();
     }
-  }, [activeRoom, fetchMessages]); // Added fetchMessages to dependencies
+  }, [activeRoom, fetchMessages]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -176,16 +174,16 @@ const ChatIcon: React.FC = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center transform hover:scale-105"
         aria-label="Open chat"
       >
-        <MessageSquare size={24} />
+        <MessageSquare className="w-6 h-6" />
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 w-full max-w-5xl h-[85vh] rounded-2xl shadow-xl overflow-hidden flex flex-col border border-zinc-800">
-            <div className="flex justify-between items-center p-4 bg-zinc-800/50 border-b border-zinc-700">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-zinc-900 w-full max-w-5xl h-[85vh] rounded-2xl shadow-xl overflow-hidden flex flex-col border border-zinc-800 animate-in slide-in-from-bottom-4 duration-300">
+            <div className="flex justify-between items-center p-4 bg-gradient-to-r from-zinc-800/50 to-zinc-900/50 border-b border-zinc-700">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-6 w-6 text-blue-500" />
                 <h2 className="text-xl font-bold text-zinc-100">Chat</h2>
@@ -194,7 +192,7 @@ const ChatIcon: React.FC = () => {
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 hover:bg-zinc-700/50 rounded-lg transition-colors"
               >
-                <X size={20} className="text-zinc-400 hover:text-zinc-200" />
+                <X className="text-zinc-400 hover:text-zinc-200" />
               </button>
             </div>
 
@@ -222,7 +220,6 @@ const ChatIcon: React.FC = () => {
             </div>
 
             <div className="flex flex-grow min-h-0">
-              {/* Rooms Sidebar */}
               <div className="w-64 bg-zinc-800/30 border-r border-zinc-700/50 flex flex-col">
                 <div className="p-4">
                   <h3 className="text-sm font-semibold text-zinc-400 mb-3">
@@ -233,16 +230,16 @@ const ChatIcon: React.FC = () => {
                       <button
                         key={room.id}
                         onClick={() => setActiveRoom(room)}
-                        className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 ${
+                        className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                           activeRoom?.id === room.id
                             ? 'bg-blue-500/20 text-blue-400'
-                            : 'text-zinc-300 hover:bg-zinc700/50'
+                            : 'text-zinc-300 hover:bg-zinc-700/50'
                         }`}
                       >
                         {activeTab === 'public' ? (
-                          <Hash size={18} className="text-zinc500" />
+                          <Hash className="w-4 h-4 text-zinc-500" />
                         ) : (
-                          <Lock size={18} className="text-zinc500" />
+                          <Lock className="w-4 h-4 text-zinc-500" />
                         )}
                         <span className="truncate">{room.name}</span>
                       </button>
@@ -251,39 +248,46 @@ const ChatIcon: React.FC = () => {
                 </div>
               </div>
 
-              {/* Chat Area */}
               <div className="flex-grow flex flex-col">
                 {activeRoom ? (
                   <>
-                    <div className="flex-grow overflow-y-auto p4 space-y4">
+                    <div className="flex-grow overflow-y-auto p-4 space-y-4">
                       {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex items-start gap3 ${
+                          className={`flex items-start gap-3 ${
                             message.user_id === user.id ? 'flex-row-reverse' : ''
                           }`}
                         >
-                          <Image
-                            src={message.user.avatar_url}
-                            alt={message.user.nickname}
-                            width={36}
-                            height={36}
-                            className="rounded-full"
-                          />
-                          <div className={`flex flex-col ${
-                            message.user_id === user.id ? 'items-end' : ''
-                          }`}>
-                            <span className="font-medium text-zinc100">
-                              {message.user.nickname}
-                            </span>
-                            <span className="text-xs text-zinc500">
-                              {new Date(message.created_at).toLocaleTimeString()}
-                            </span>
-                            <p className={`text-zinc300 rounded-lg py2 px3 mt1 max-w-md ${
-                              message.user_id === user.id
-                                ? 'bg-blue500/20 text-blue100'
-                                : 'bg-zinc800/50'
-                            }`}>
+                          <div className="flex-shrink-0">
+                            <Image
+                              src={message.user.avatar_url}
+                              alt={message.user.nickname}
+                              width={36}
+                              height={36}
+                              className="rounded-full"
+                            />
+                          </div>
+                          <div
+                            className={`flex flex-col ${
+                              message.user_id === user.id ? 'items-end' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-zinc-100">
+                                {message.user.nickname}
+                              </span>
+                              <span className="text-xs text-zinc-500">
+                                {new Date(message.created_at).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <p
+                              className={`text-zinc-300 rounded-lg py-2 px-3 mt-1 max-w-md ${
+                                message.user_id === user.id
+                                  ? 'bg-blue-500/20 text-blue-100'
+                                  : 'bg-zinc-800/50'
+                              }`}
+                            >
                               {message.content}
                             </p>
                           </div>
@@ -292,30 +296,33 @@ const ChatIcon: React.FC = () => {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    <form onSubmit={handleSendMessage} className="p4 bg-zinc800/30 border-t border-zinc700/50">
-                      <div className="flex gap-x2">
+                    <form
+                      onSubmit={handleSendMessage}
+                      className="p-4 bg-zinc-800/30 border-t border-zinc-700/50"
+                    >
+                      <div className="flex gap-x-2">
                         <input
                           type="text"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          className="flex-grow bg-zinc800 text-white px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                          className="flex-grow bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
                           placeholder="Type your message..."
                         />
                         <button
                           type="submit"
                           disabled={!newMessage.trim()}
-                          className={`bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors flex items-center gap2 ${
-                            !newMessage.trim() ? 'opacity50 cursor-notallowed' : ''
+                          className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center gap-2 ${
+                            !newMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
-                          <Send size={18} />
+                          <Send className="w-4 h-4" />
                         </button>
                       </div>
                     </form>
                   </>
                 ) : (
                   <div className="flex-grow flex items-center justify-center">
-                    <p className="text-zinc500">Select a room to start chatting</p>
+                    <p className="text-zinc-500">Select a room to start chatting</p>
                   </div>
                 )}
               </div>
