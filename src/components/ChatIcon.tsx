@@ -267,47 +267,54 @@ const ChatIcon: React.FC = () => {
                 {activeRoom ? (
                   <>
                     <div className="flex-grow overflow-y-auto p4 space-y4">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex items-start gap3 ${
-                            message.user_id === user.id ? 'flex-row-reverse' : ''
-                          }`}
-                        >
-                          <div className="flex-shrink0">
-                            <Image
-                              src={message.user.avatar_url}
-                              alt={message.user.nickname}
-                              width={36}
-                              height={36}
-                              className="rounded-full"
-                            />
-                          </div>
-                          <div
-                            className={`flex flex-col ${
-                              message.user_id === user.id ? 'items-end' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap2">
-                              <span className="font-medium text-zinc100">
-                                {message.user.nickname}
-                              </span>
-                              <span className="text-xs text-zinc500">
-                                {new Date(message.created_at).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            <p
-                              className={`text-zinc300 rounded-lg py2 px3 mt1 max-w-md ${
-                                message.user_id === user.id
-                                  ? 'bg-blue500/20 text-blue100'
-                                  : 'bg-zinc800/50'
-                              }`}
-                            >
-                              {message.content}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                    {messages.map((message) => (
+  <div
+    key={message.id}
+    className={`flex items-start gap-4 p-4 ${
+      message.user_id === user.id ? 'flex-row-reverse' : ''
+    }`}
+  >
+    <div className="flex-shrink-0">
+      <Image
+        src={message.user.avatar_url}
+        alt={message.user.nickname}
+        width={40}
+        height={40}
+        className="rounded-full border-2 border-zinc-700"
+      />
+    </div>
+    <div
+      className={`flex flex-col max-w-[70%] ${
+        message.user_id === user.id ? 'items-end' : 'items-start'
+      }`}
+    >
+      <div className={`flex items-center gap-2 mb-1 ${
+        message.user_id === user.id ? 'flex-row-reverse' : ''
+      }`}>
+        <span className="font-medium text-zinc-100 text-sm">
+          {message.user.nickname}
+        </span>
+        <span className="text-xs text-zinc-500">
+          {new Date(message.created_at).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </span>
+      </div>
+      <div
+        className={`rounded-lg py-2 px-4 ${
+          message.user_id === user.id
+            ? 'bg-blue-600 text-white rounded-tr-none'
+            : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
+        }`}
+      >
+        <p className="text-sm leading-relaxed break-words">
+          {message.content}
+        </p>
+      </div>
+    </div>
+  </div>
+))}
                       <div ref={messagesEndRef} />
                     </div>
 
