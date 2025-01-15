@@ -268,76 +268,74 @@ const ChatIcon: React.FC = () => {
                   <>
                     <div className="flex-grow overflow-y-auto p4 space-y4">
                     {messages.map((message) => (
-  <div
-    key={message.id}
-    className={`flex items-start gap-4 p-4 ${
-      message.user_id === user.id ? 'flex-row-reverse' : ''
-    }`}
-  >
-    <div className="flex-shrink-0">
-      <Image
-        src={message.user.avatar_url}
-        alt={message.user.nickname}
-        width={40}
-        height={40}
-        className="rounded-full border-2 border-zinc-700"
-      />
-    </div>
-    <div
-      className={`flex flex-col max-w-[70%] ${
-        message.user_id === user.id ? 'items-end' : 'items-start'
-      }`}
-    >
-      <div className={`flex items-center gap-2 mb-1 ${
-        message.user_id === user.id ? 'flex-row-reverse' : ''
-      }`}>
-        <span className="font-medium text-zinc-100 text-sm">
-          {message.user.nickname}
-        </span>
-        <span className="text-xs text-zinc-500">
-          {new Date(message.created_at).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </span>
-      </div>
-      <div
-        className={`rounded-lg py-2 px-4 ${
-          message.user_id === user.id
-            ? 'bg-blue-600 text-white rounded-tr-none'
-            : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
-        }`}
-      >
-        <p className="text-sm leading-relaxed break-words">
-          {message.content}
-        </p>
-      </div>
-    </div>
-  </div>
-))}
+                      <div
+                        key={message.id}
+                        className={`flex items-start gap-4 p-4 ${
+                          message.user_id === user.id ? 'flex-row-reverse' : ''
+                        }`}
+                      >
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={message.user.avatar_url}
+                            alt={message.user.nickname}
+                            width={40}
+                            height={40}
+                            className="rounded-full border-2 border-zinc-700"
+                          />
+                        </div>
+                        <div
+                          className={`flex flex-col max-w-[70%] ${
+                            message.user_id === user.id ? 'items-end' : 'items-start'
+                          }`}
+                        >
+                          <div className={`flex items-center gap-2 mb-1 ${
+                            message.user_id === user.id ? 'flex-row-reverse' : ''
+                          }`}>
+                            <span className="font-medium text-zinc-100 text-sm">
+                              {message.user.nickname}
+                            </span>
+                            <span className="text-xs text-zinc-500">
+                              {new Date(message.created_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <div
+                            className={`rounded-lg py-2 px-4 ${
+                              message.user_id === user.id
+                                ? 'bg-blue-600 text-white rounded-tr-none'
+                                : 'bg-zinc-800 text-zinc-100 rounded-tl-none'
+                            }`}
+                          >
+                            <p className="text-sm leading-relaxed break-words">
+                              {message.content}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                       <div ref={messagesEndRef} />
                     </div>
 
                     <form
                       onSubmit={handleSendMessage}
-                      className="p4 bg-zinc800/30 border-t border-zinc700/50"
+                      className="p-4 bg-zinc-800/30 border-t border-zinc-700/50"
                     >
-                      <div className="flex gap-x2">
+                      <div className="flex items-center gap-x-3">
                         <input
                           type="text"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          className="flex-grow bg-zinc800 text-white px4 py2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
+                          className="flex-grow bg-zinc-800 text-white px-4 py-2.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-zinc-500"
                           placeholder="Écrivez votre message..."
                         />
                         <button
                           type="submit"
                           disabled={!newMessage.trim()}
-                          className={`bg-gradient-to-r from-blue600 to-blue700 text-white px4 py2 rounded-lg hover:from-blue700 hover:to-blue800 transition-colors flex items-center gap2 ${
-                            !newMessage.trim() ? 'opacity50 cursor-notallowed' : ''
-                          }`}
+                          className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700`}
                         >
-                          <Send className="w4 h4" />
+                          <Send className="w-5 h-5" />
                         </button>
                       </div>
                     </form>
