@@ -22,11 +22,6 @@ type Room = {
   type: 'public' | 'private';
 };
 
-type Profile = {
-  nickname: string;
-  avatar_url: string;
-};
-
 type MessageWithProfile = {
   id: string;
   content: string;
@@ -48,8 +43,7 @@ const ChatIcon: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
+  
   const supabase = createClientComponentClient();
 
   const scrollToBottom = () => {
@@ -84,27 +78,26 @@ const ChatIcon: React.FC = () => {
           schema: 'public', 
           table: 'messages', 
           filter: `room_id=eq.${activeRoom}` 
-        }, payload => {
-          const newMessage = payload.new as any;
+        }, async (payload) => {
+          const newMessageData = payload.new as MessageWithProfile; // Use specific type
           // Format the message with user data
-          supabase
+          const { data: profile } = await supabase
             .from('profiles')
             .select('nickname, avatar_url')
-            .eq('id', newMessage.user_id)
-            .single()
-            .then(({ data: profile }) => {
-              if (profile) {
-                setMessages(current => [...current, {
-                  id: newMessage.id,
-                  content: newMessage.content,
-                  created_at: newMessage.created_at,
-                  user: {
-                    nickname: profile.nickname || 'Anonymous',
-                    avatar_url: profile.avatar_url || '/default-avatar.png'
-                  }
-                }]);
+            .eq('id', newMessageData.user_id)
+            .single();
+
+          if (profile) {
+            setMessages(current => [...current, {
+              id: newMessageData.id,
+              content: newMessageData.content,
+              created_at: newMessageData.created_at,
+              user: {
+                nickname: profile.nickname || 'Anonymous',
+                avatar_url: profile.avatar_url || '/default-avatar.png'
               }
-            });
+            }]);
+          }
         })
         .subscribe();
 
@@ -112,7 +105,7 @@ const ChatIcon: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [activeRoom, supabase]);
+  }, [activeRoom, supabase]); // Ensure all dependencies are included
 
   const fetchRooms = async () => {
     const { data } = await supabase
@@ -142,19 +135,25 @@ const ChatIcon: React.FC = () => {
       .order('created_at', { ascending: true });
 
     if (data) {
-      const rawMessages = data as unknown as MessageWithProfile[];
-      const formattedMessages: Message[] = rawMessages.map(message => ({
-        id: message.id,
-        content: message.content,
-        created_at: message.created_at,
-        user: {
-          nickname: message.profiles?.nickname || 'Anonymous',
-          avatar_url: message.profiles?.avatar_url || '/default-avatar.png'
-        }
-      }));
+      const formattedMessages: Message[] = data.map((message) => {
+        // Ensure profiles is treated as an array and check for null
+        const profiles = message.profiles || [];
+        const firstProfile = profiles.length > 0 ? profiles[0] : { nickname: 'Anonymous', avatar_url: '/default-avatar.png' };
+        
+        return {
+          id: message.id,
+          content: message.content,
+          created_at: message.created_at,
+          user: {
+            nickname: firstProfile.nickname,
+            avatar_url: firstProfile.avatar_url
+          }
+        };
+      });
       setMessages(formattedMessages);
     }
-  };
+};
+
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -253,7 +252,7 @@ const ChatIcon: React.FC = () => {
 
                   {/* Messages */}
                   <div 
-                    ref={chatContainerRef}
+                    ref={messagesEndRef}
                     className="flex-1 overflow-y-auto p-4 space-y-4"
                   >
                     {messages.map((message, index) => {
@@ -283,7 +282,7 @@ const ChatIcon: React.FC = () => {
                                 </span>
                               </div>
                             )}
-                            <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-words">
+                            <p className="text-zinc-300 bg-zinc-800/50 rounded-lg py-2 px-3 break-word">
                               {message.content}
                             </p>
                           </div>
@@ -303,13 +302,13 @@ const ChatIcon: React.FC = () => {
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="flex-1 bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg border border-zinc700 focus:outline-none focus:border-blue500 transition-colors"
                   placeholder="Écrivez votre message..."
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="bg-blue600 text-white px4 py2 rounded-lg hover:bg-blue700 transition-colors disabled:opacity50 disabled:cursor-notallowed flex items-center gap2"
                 >
                   <Send size={18} />
                   <span>Envoyer</span>
